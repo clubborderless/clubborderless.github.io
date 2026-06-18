@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Club Borderless</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600;700&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f4eee8; --paper:#faf7f2; --paper2:#fbf9f5;
+    --ink:#2b2722; --sub:#5f594e; --muted:#9b9183;
+    --bronze:#826a48; --bronze2:#a3895f; --gold:#b8975a;
+    --line:#e6ded1; --line2:#efe8dc; --chip:#efe7da;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{font-family:"Jost","Hiragino Kaku Gothic ProN",sans-serif; color:var(--ink); background:var(--bg); font-weight:300; line-height:1.85; -webkit-font-smoothing:antialiased;}
+  .serif{font-family:"Shippori Mincho",serif;}
+  a{color:inherit;} button{font-family:inherit; cursor:pointer;}
+  .wrap{max-width:1160px; margin:0 auto; padding:0 28px;}
+  .hidden{display:none!important;}
+
+  /* ---- login ---- */
+  #login{min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px;}
+  #login .card{background:var(--paper); border:1px solid var(--line2); border-radius:10px; padding:50px 42px; max-width:440px; width:100%; text-align:center;}
+  #login .mark{font-family:"Shippori Mincho",serif; font-weight:600; font-size:23px; letter-spacing:.3em;}
+  #login .by{font-size:10px; letter-spacing:.14em; color:var(--gold); margin-top:8px;}
+  #login .lead{font-size:13px; color:var(--sub); margin:22px 0 26px; line-height:1.9;}
+  #login input{width:100%; border:1px solid var(--line); background:var(--paper2); padding:13px 15px; font-family:inherit; font-size:14px; border-radius:5px;}
+  #login input:focus{outline:none; border-color:var(--bronze2);}
+  #login .btn{width:100%; background:var(--ink); color:#f4eee8; border:none; padding:14px; font-size:14px; letter-spacing:.12em; border-radius:5px; margin-top:14px;}
+  #login .btn:hover{background:#3d362c;}
+  #login .note{font-size:11.5px; color:var(--muted); margin-top:18px;}
+  #login .msg{font-size:13px; color:var(--bronze); margin-top:16px; min-height:18px;}
+
+  /* ---- header ---- */
+  header.top{position:sticky; top:0; z-index:50; background:rgba(244,238,232,.88); backdrop-filter:blur(10px); border-bottom:1px solid var(--line);}
+  .top-in{display:flex; align-items:center; justify-content:space-between; padding:16px 28px; max-width:1160px; margin:0 auto;}
+  .brand{display:flex; flex-direction:column; gap:4px;}
+  .brand .mark{font-family:"Shippori Mincho",serif; font-weight:600; font-size:20px; letter-spacing:.34em;}
+  .brand .by{font-size:10px; letter-spacing:.14em; color:var(--gold);}
+  .me{display:flex; align-items:center; gap:10px;}
+  .me .av{width:34px; height:34px; border-radius:50%; background:linear-gradient(135deg,#9a7f57,#7b6440); color:#f7f1e7; display:flex; align-items:center; justify-content:center; font-family:"Shippori Mincho",serif; font-size:15px; background-size:cover; background-position:center;}
+  .me .nm{font-size:13px;}
+  .me .gho{font-size:11px; letter-spacing:.1em; color:var(--muted); border:1px solid var(--line); background:transparent; padding:6px 11px; border-radius:3px;}
+  .me .gho:hover{color:var(--bronze); border-color:var(--bronze2);}
+
+  nav.tabs{border-bottom:1px solid var(--line); background:rgba(244,238,232,.88); backdrop-filter:blur(10px); position:sticky; top:69px; z-index:49;}
+  .tabs-in{display:flex; gap:4px; max-width:1160px; margin:0 auto; padding:0 28px; justify-content:center;}
+  .tab{background:none; border:none; padding:15px 20px 12px; font-size:13px; letter-spacing:.14em; color:var(--muted); border-bottom:2px solid transparent; margin-bottom:-1px;}
+  .tab .en{display:block; font-size:9px; letter-spacing:.2em; margin-top:3px; opacity:.7;}
+  .tab.on{color:var(--ink); border-bottom-color:var(--bronze);}
+
+  section.page{display:none; padding:50px 0 90px;} section.page.on{display:block;}
+  .lede{text-align:center; margin-bottom:36px;}
+  .lede .cap{font-size:10.5px; letter-spacing:.34em; color:var(--gold); text-transform:uppercase; display:block; margin-bottom:13px;}
+  .lede h2{font-family:"Shippori Mincho",serif; font-weight:500; font-size:29px; letter-spacing:.04em;}
+  .lede p{color:var(--sub); font-size:13.5px; margin-top:12px;}
+
+  .filters{display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-bottom:16px;}
+  .chip{border:1px solid var(--line); background:var(--paper); color:var(--sub); font-size:12px; letter-spacing:.06em; padding:8px 15px; border-radius:30px;}
+  .chip:hover{border-color:var(--bronze2); color:var(--bronze);}
+  .chip.on{background:var(--ink); color:#f4eee8; border-color:var(--ink);}
+  .search{display:flex; justify-content:center; margin-bottom:34px;}
+  .search input{width:min(520px,100%); border:1px solid var(--line); background:var(--paper); padding:12px 18px; font-family:inherit; font-size:13.5px; border-radius:30px;}
+  .search input:focus{outline:none; border-color:var(--bronze2);}
+
+  .mgrid{display:grid; grid-template-columns:repeat(3,1fr); gap:24px;}
+  @media(max-width:880px){.mgrid{grid-template-columns:repeat(2,1fr);}}
+  @media(max-width:560px){.mgrid{grid-template-columns:1fr;}}
+  .mcard{background:var(--paper); border:1px solid var(--line2); border-radius:6px; padding:28px 24px 24px; text-align:center; transition:.25s; cursor:pointer; position:relative;}
+  .mcard:hover{border-color:var(--bronze2); transform:translateY(-3px); box-shadow:0 14px 34px -22px rgba(80,60,30,.4);}
+  .mcard .cat{position:absolute; top:13px; right:13px; font-size:9.5px; letter-spacing:.08em; padding:4px 9px; border-radius:20px;}
+  .av-lg{width:80px; height:80px; border-radius:50%; margin:4px auto 15px; display:flex; align-items:center; justify-content:center; font-family:"Shippori Mincho",serif; font-size:29px; color:#f7f1e7; background:linear-gradient(140deg,#b29a72,#856a45); background-size:cover; background-position:center;}
+  .mcard .nm{font-family:"Shippori Mincho",serif; font-size:18px; letter-spacing:.04em;}
+  .mcard .role{font-size:11.5px; color:var(--bronze); margin-top:5px;}
+  .mcard .loc{font-size:11px; color:var(--muted); margin-top:2px;}
+  .mcard .bio{font-size:12.5px; color:var(--sub); margin-top:13px; line-height:1.8; min-height:44px;}
+  .mcard .links{display:flex; gap:14px; justify-content:center; margin-top:15px; padding-top:14px; border-top:1px solid var(--line2); flex-wrap:wrap;}
+  .mcard .links span{font-size:11px; color:var(--muted);}
+  .c-宿泊{background:#e7eef4; color:#3f5a73;} .c-サービス{background:#e6f0e8; color:#3f6a4c;}
+  .c-物販{background:#f5ead9; color:#9a6c2e;} .c-飲食{background:#f6e6e4; color:#a14e44;}
+  .c-コンサル{background:#f1e6f0; color:#7c4f78;} .c-その他{background:#ececea; color:#6a6760;}
+
+  .board{display:grid; grid-template-columns:330px 1fr; gap:28px; align-items:start;}
+  @media(max-width:820px){.board{grid-template-columns:1fr;}}
+  .composer{background:var(--paper); border:1px solid var(--line2); border-radius:6px; padding:22px 20px; position:sticky; top:130px;}
+  @media(max-width:820px){.composer{position:static;}}
+  .composer h3{font-family:"Shippori Mincho",serif; font-weight:500; font-size:17px; margin-bottom:16px;}
+  .fld{margin-bottom:13px;} .fld label{display:block; font-size:11px; letter-spacing:.1em; color:var(--muted); text-transform:uppercase; margin-bottom:5px;}
+  .fld select,.fld input,.fld textarea{width:100%; border:1px solid var(--line); background:var(--paper2); padding:10px 12px; font-family:inherit; font-size:13px; border-radius:4px;}
+  .fld textarea{min-height:90px; resize:vertical; line-height:1.7;}
+  .fld select:focus,.fld input:focus,.fld textarea:focus{outline:none; border-color:var(--bronze2);}
+  .btn{width:100%; background:var(--ink); color:#f4eee8; border:none; padding:12px; font-size:13px; letter-spacing:.12em; border-radius:4px;}
+  .btn:hover{background:#3d362c;} .btn[disabled]{opacity:.5;}
+
+  .feed{display:flex; flex-direction:column; gap:18px;}
+  .post{background:var(--paper); border:1px solid var(--line2); border-radius:6px; padding:22px 24px;}
+  .post .ph{display:flex; align-items:center; justify-content:space-between; margin-bottom:11px;}
+  .post .who{display:flex; align-items:center; gap:10px;}
+  .avs{width:30px; height:30px; border-radius:50%; background:linear-gradient(140deg,#b29a72,#856a45); color:#f7f1e7; display:flex; align-items:center; justify-content:center; font-family:"Shippori Mincho",serif; font-size:13px; flex:none; background-size:cover; background-position:center;}
+  .post .nm{font-size:12.5px;} .post .when{font-size:11px; color:var(--muted);}
+  .pcat{font-size:9.5px; letter-spacing:.08em; padding:4px 10px; border-radius:20px;}
+  .b-リクエスト{background:#f7e4dc; color:#a85c3e;} .b-相談{background:#e7eef4; color:#3f5a73;}
+  .b-シェア{background:#f5ead9; color:#9a6c2e;} .b-コラボ募集{background:#e6f0e8; color:#3f6a4c;}
+  .b-お知らせ{background:#f1e6f0; color:#7c4f78;} .b-雑談{background:#ececea; color:#6a6760;}
+  .post h4{font-family:"Shippori Mincho",serif; font-weight:500; font-size:17px; margin:5px 0 7px;}
+  .post .body{font-size:13.5px; color:var(--sub); line-height:1.85; white-space:pre-wrap; word-break:break-word;}
+  .post .body a{color:var(--bronze);}
+  .post .act{display:flex; gap:18px; margin-top:13px; padding-top:12px; border-top:1px solid var(--line2);}
+  .post .act button{background:none; border:none; font-size:12px; color:var(--muted); letter-spacing:.04em;}
+  .post .act button.liked{color:var(--bronze);} .post .act button:hover{color:var(--bronze);}
+  .cmts{margin-top:13px; display:flex; flex-direction:column; gap:9px;}
+  .cmt{background:var(--paper2); border-radius:5px; padding:10px 13px;}
+  .cmt .ch{display:flex; gap:8px; margin-bottom:3px;} .cmt .ch .nm{font-size:11.5px;} .cmt .ch .wh{font-size:10px; color:var(--muted);}
+  .cmt .tx{font-size:12.5px; color:var(--sub);}
+  .creply{display:flex; gap:8px; margin-top:9px;}
+  .creply input{flex:1; border:1px solid var(--line); background:var(--paper2); padding:9px 12px; font-family:inherit; font-size:12.5px; border-radius:30px;}
+  .creply input:focus{outline:none; border-color:var(--bronze2);}
+  .creply button{background:var(--bronze); color:#f7f1e7; border:none; padding:0 16px; font-size:12px; border-radius:30px;}
+
+  .mediawrap{display:flex; flex-direction:column; gap:28px;}
+  .countryblock h3{font-family:"Shippori Mincho",serif; font-weight:500; font-size:16px; letter-spacing:.04em; margin-bottom:13px; padding-bottom:8px; border-bottom:1px solid var(--line);}
+  .mcards{display:grid; grid-template-columns:repeat(3,1fr); gap:16px;}
+  @media(max-width:880px){.mcards{grid-template-columns:repeat(2,1fr);}} @media(max-width:560px){.mcards{grid-template-columns:1fr;}}
+  .media{background:var(--paper); border:1px solid var(--line2); border-radius:6px; padding:17px 17px 15px; position:relative;}
+  .media .star{position:absolute; top:13px; right:13px; font-size:11px; color:var(--gold);}
+  .media .mn{font-family:"Shippori Mincho",serif; font-size:14.5px;} .media .memo{font-size:12px; color:var(--sub); margin-top:6px; line-height:1.7;}
+  .media .go{display:inline-block; margin-top:10px; font-size:11px; letter-spacing:.08em; color:var(--bronze); text-decoration:none;}
+  .syncnote{text-align:center; font-size:11.5px; color:var(--muted); background:var(--paper); border:1px solid var(--line2); border-radius:30px; padding:8px 18px; display:inline-block; margin:0 auto 24px;} .center{text-align:center;}
+
+  .events{display:flex; flex-direction:column; gap:16px; max-width:760px; margin:0 auto;}
+  .event{display:flex; gap:22px; background:var(--paper); border:1px solid var(--line2); border-radius:6px; padding:22px 24px; align-items:flex-start;}
+  .event .date{flex:none; width:74px; text-align:center; border-right:1px solid var(--line); padding-right:18px;}
+  .event .date .m{font-size:11px; letter-spacing:.12em; color:var(--bronze); text-transform:uppercase;}
+  .event .date .d{font-family:"Shippori Mincho",serif; font-size:32px; line-height:1;} .event .date .w{font-size:11px; color:var(--muted); margin-top:3px;}
+  .event .ev-body h4{font-family:"Shippori Mincho",serif; font-weight:500; font-size:17px; margin-bottom:5px;}
+  .event .ev-body .meta{font-size:11.5px; color:var(--bronze); margin-bottom:7px;} .event .ev-body p{font-size:13px; color:var(--sub); line-height:1.8;}
+  .event .ev-body .rsvp{margin-top:11px; background:transparent; border:1px solid var(--bronze2); color:var(--bronze); font-size:11.5px; letter-spacing:.1em; padding:8px 18px; border-radius:30px;}
+  .event .ev-body .rsvp.on{background:var(--bronze); color:#f7f1e7;}
+
+  .addbar{text-align:center; margin-top:28px;}
+  .addbtn{background:transparent; border:1px dashed var(--bronze2); color:var(--bronze); font-size:12px; letter-spacing:.1em; padding:12px 24px; border-radius:30px;}
+  .addbtn:hover{background:var(--paper); border-style:solid;}
+  .empty{text-align:center; color:var(--muted); font-size:13px; padding:36px 0;}
+
+  .modal{position:fixed; inset:0; background:rgba(40,34,28,.42); display:none; align-items:center; justify-content:center; z-index:100; padding:24px;}
+  .modal.on{display:flex;}
+  .modal .box{background:var(--bg); border-radius:8px; max-width:520px; width:100%; max-height:88vh; overflow:auto; padding:34px 34px;}
+  .modal .x{float:right; background:none; border:none; font-size:20px; color:var(--muted);}
+  .modal h3{font-family:"Shippori Mincho",serif; font-weight:500; font-size:21px; text-align:center;}
+  .modal .role{text-align:center; color:var(--bronze); font-size:12.5px; margin-top:5px;}
+  .modal .loc{text-align:center; color:var(--muted); font-size:12px; margin-bottom:18px;}
+  .modal .row{border-top:1px solid var(--line); padding:12px 0;} .modal .row .k{font-size:10.5px; letter-spacing:.12em; color:var(--muted); text-transform:uppercase; margin-bottom:3px;} .modal .row .v{font-size:13.5px; color:var(--sub); line-height:1.8;}
+  .modal .mlinks{display:flex; gap:14px; justify-content:center; margin-top:16px; flex-wrap:wrap;}
+  .modal .mlinks a{font-size:12px; color:var(--bronze); text-decoration:none; border:1px solid var(--line); padding:8px 15px; border-radius:30px;}
+  .modal .fld{margin-bottom:12px;}
+  .footnote{text-align:center; font-size:11px; color:var(--muted); letter-spacing:.06em; padding:30px 0 50px;}
+  #loading{min-height:100vh; display:flex; align-items:center; justify-content:center; color:var(--muted); font-size:13px; letter-spacing:.1em;}
+</style>
+</head>
+<body>
+
+<div id="loading">読み込み中…</div>
+
+<!-- LOGIN -->
+<div id="login" class="hidden">
+  <div class="card">
+    <div class="mark serif">CLUB BORDERLESS</div>
+    <div class="by">by Holland Village Members Club ｜ 起業家ワークショップ</div>
+    <p class="lead">メンバー限定のコミュニティです。<br>登録メールアドレスにログイン用のリンクをお送りします。</p>
+    <input id="loginEmail" type="email" placeholder="メールアドレス" autocomplete="email">
+    <button class="btn" id="loginBtn" onclick="sendLink()">ログインリンクを送る</button>
+    <div class="msg" id="loginMsg"></div>
+    <div class="note">パスワードは不要です。届いたメールのリンクを押すとログインできます。</div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app" class="hidden">
+  <header class="top">
+    <div class="top-in">
+      <div class="brand">
+        <span class="mark serif">CLUB BORDERLESS</span>
+        <span class="by">by Holland Village Members Club ｜ 起業家ワークショップ</span>
+      </div>
+      <div class="me">
+        <span class="av" id="meAv"></span>
+        <span class="nm" id="meName"></span>
+        <button class="gho" onclick="openProfileEdit()">プロフィール</button>
+        <button class="gho" onclick="logout()">退出</button>
+      </div>
+    </div>
+  </header>
+
+  <nav class="tabs"><div class="tabs-in">
+    <button class="tab on" data-tab="members">メンバー<span class="en">MEMBERS</span></button>
+    <button class="tab" data-tab="board">掲示板<span class="en">BOARD</span></button>
+    <button class="tab" data-tab="useful">お役立ち<span class="en">RESOURCES</span></button>
+    <button class="tab" data-tab="events">イベント<span class="en">EVENTS</span></button>
+  </div></nav>
+
+  <section class="page on" id="members"><div class="wrap">
+    <div class="lede"><span class="cap">Members</span><h2 class="serif">メンバー名鑑</h2><p>日本各地から集う、女性起業家たち。気になる人を見つけて、つながってください。</p></div>
+    <div class="filters" id="mfilters"></div>
+    <div class="search"><input id="msearch" placeholder="名前・事業・キーワードで検索" oninput="renderMembers()"></div>
+    <div class="mgrid" id="mgrid"></div>
+    <div class="addbar"><button class="addbtn" onclick="openProfileEdit()">＋ 自分の自己紹介を編集する</button></div>
+  </div></section>
+
+  <section class="page" id="board"><div class="wrap">
+    <div class="lede"><span class="cap">Board</span><h2 class="serif">掲示板</h2><p>相談・シェア・コラボ募集・リクエスト。カテゴリを選んで投稿、コメントで会話できます。</p></div>
+    <div class="filters" id="bfilters"></div>
+    <div class="search"><input id="bsearch" placeholder="投稿を検索" oninput="renderBoard()"></div>
+    <div class="board">
+      <div class="composer">
+        <h3 class="serif">投稿する</h3>
+        <div class="fld"><label>カテゴリ</label><select id="pcat"><option>リクエスト</option><option>相談</option><option>シェア</option><option>コラボ募集</option><option>お知らせ</option><option>雑談</option></select></div>
+        <div class="fld"><label>タイトル</label><input id="ptitle" placeholder="例：海外発送のコツを知りたい"></div>
+        <div class="fld"><label>内容</label><textarea id="pbody" placeholder="相談・シェア・募集したいことを書いてください。"></textarea></div>
+        <div class="fld"><label>リンク（任意）</label><input id="purl" placeholder="https://"></div>
+        <button class="btn" id="postBtn" onclick="addPost()">投稿する</button>
+      </div>
+      <div class="feed" id="feed"></div>
+    </div>
+  </div></section>
+
+  <section class="page" id="useful"><div class="wrap">
+    <div class="lede"><span class="cap">Resources</span><h2 class="serif">お役立ち情報</h2><p>訪日ゲストに届く、国別のメディア・情報源リスト。集客に役立ててください。</p></div>
+    <div class="center"><span class="syncnote">🌏 国別の訪日メディア・情報源</span></div>
+    <div class="filters" id="cfilters"></div>
+    <div class="mediawrap" id="mediawrap"></div>
+  </div></section>
+
+  <section class="page" id="events"><div class="wrap">
+    <div class="lede"><span class="cap">Events</span><h2 class="serif">イベント</h2><p>交流会や勉強会のお知らせ。参加表明もここから。</p></div>
+    <div class="events" id="eventlist"></div>
+    <div class="addbar"><button class="addbtn" onclick="openEventCreate()">＋ イベントを立てる</button></div>
+  </div></section>
+
+  <div class="footnote">CLUB BORDERLESS　｜　by Holland Village Members Club ｜ 起業家ワークショップ</div>
+</div>
+
+<div class="modal" id="modal"><div class="box" id="modalbox"></div></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script>
+const sb = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_KEY);
+let ME=null, MEMBERS=[], POSTS=[], COMMENTS=[], LIKES=[], RESOURCES=[], EVENTS=[], RSVPS=[];
+let mFilter="すべて", bFilter="すべて", cFilter="すべて";
+const MEMBER_CATS=["すべて","宿泊","サービス","物販","飲食","コンサル","その他"];
+const BOARD_CATS=["すべて","リクエスト","相談","シェア","コラボ募集","お知らせ","雑談"];
+const $=id=>document.getElementById(id);
+const esc=s=>(s==null?"":String(s)).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function fmt(ts){const d=new Date(ts);const p=n=>String(n).padStart(2,"0");return (d.getMonth()+1)+"/"+d.getDate()+" "+p(d.getHours())+":"+p(d.getMinutes());}
+function avStyle(url){return url?`style="background-image:url('${esc(url)}')"`:"";}
+function ini(n){return (n||"?").trim().charAt(0);}
+
+/* ---------- auth ---------- */
+async function boot(){
+  const { data:{ session } } = await sb.auth.getSession();
+  sb.auth.onAuthStateChange((_e,s)=>{ render(s); });
+  render(session);
+}
+async function render(session){
+  if(!session){ $("loading").classList.add("hidden"); $("app").classList.add("hidden"); $("login").classList.remove("hidden"); return; }
+  $("login").classList.add("hidden");
+  await ensureMe(session);
+  $("loading").classList.add("hidden"); $("app").classList.remove("hidden");
+  await Promise.all([loadMembers(), loadBoard(), loadResources(), loadEvents()]);
+}
+async function ensureMe(session){
+  let { data } = await sb.from("profiles").select("*").eq("user_id",session.user.id).maybeSingle();
+  if(!data){
+    const name=(session.user.email||"member").split("@")[0];
+    const ins=await sb.from("profiles").insert({user_id:session.user.id,name}).select().single();
+    data=ins.data;
+  }
+  ME=data;
+  $("meName").textContent=ME?ME.name:"";
+  $("meAv").textContent=ME&&!ME.photo_url?ini(ME.name):"";
+  if(ME&&ME.photo_url)$("meAv").style.backgroundImage=`url('${ME.photo_url}')`;
+}
+async function sendLink(){
+  const email=$("loginEmail").value.trim();
+  if(!email){ $("loginMsg").textContent="メールアドレスを入力してください。"; return; }
+  $("loginBtn").disabled=true;
+  const { error }=await sb.auth.signInWithOtp({ email, options:{ emailRedirectTo: location.origin + location.pathname } });
+  $("loginBtn").disabled=false;
+  $("loginMsg").textContent = error ? ("エラー："+error.message) : "ログインリンクを送りました。メールを確認してください。";
+}
+async function logout(){ await sb.auth.signOut(); location.reload(); }
+
+/* ---------- data ---------- */
+async function loadMembers(){ const { data }=await sb.from("profiles").select("*").order("is_seed").order("created_at"); MEMBERS=data||[]; renderMembers(); }
+async function loadBoard(){
+  const a=await sb.from("posts").select("*, author:profiles!posts_author_id_fkey(name,photo_url)").order("created_at",{ascending:false});
+  const b=await sb.from("comments").select("*, author:profiles!comments_author_id_fkey(name)").order("created_at");
+  const c=await sb.from("post_likes").select("post_id,user_id");
+  POSTS=a.data||[]; COMMENTS=b.data||[]; LIKES=c.data||[]; renderBoard();
+}
+async function loadResources(){ const { data }=await sb.from("resources").select("*").order("country"); RESOURCES=data||[]; renderMedia(); }
+async function loadEvents(){
+  const e=await sb.from("events").select("*").order("event_date",{nullsFirst:false});
+  const r=await sb.from("event_rsvps").select("event_id,user_id");
+  EVENTS=e.data||[]; RSVPS=r.data||[]; renderEvents();
+}
+
+/* ---------- render ---------- */
+function chipRow(el,list,cur,cb){ el.innerHTML=""; list.forEach(c=>{const b=document.createElement("button"); b.className="chip"+(c===cur?" on":""); b.textContent=c; b.onclick=()=>cb(c); el.appendChild(b);}); }
+
+function renderMembers(){
+  chipRow($("mfilters"),MEMBER_CATS,mFilter,c=>{mFilter=c;renderMembers();});
+  const q=($("msearch").value||"").trim();
+  const list=MEMBERS.filter(m=>(mFilter==="すべて"||m.category===mFilter)&&(!q||((m.name||"")+(m.role||"")+(m.bio||"")+(m.location||"")+(m.give||"")).includes(q)));
+  const g=$("mgrid");
+  if(!list.length){g.innerHTML='<div class="empty">該当するメンバーがいません。</div>';return;}
+  g.innerHTML=list.map((m,i)=>`<div class="mcard" onclick="openMember(${i})">
+    ${m.category?`<span class="cat c-${m.category}">${m.category}</span>`:""}
+    <div class="av-lg" ${avStyle(m.photo_url)}>${m.photo_url?"":esc(ini(m.name))}</div>
+    <div class="nm">${esc(m.name)}</div>
+    <div class="role">${esc(m.role||"")}</div>
+    <div class="loc">${esc(m.location||"")}</div>
+    <div class="bio">${esc(m.bio||"")}</div>
+    <div class="links">${m.web?`<span>${esc(m.web)}</span>`:""}${m.sns?`<span>${esc(m.sns.replace("Instagram ","◎ "))}</span>`:""}</div>
+  </div>`).join("");
+  window.__mlist=list;
+}
+function openMember(i){
+  const m=window.__mlist[i];
+  $("modalbox").innerHTML=`<button class="x" onclick="closeModal()">×</button>
+    <div style="text-align:center"><div class="av-lg" ${avStyle(m.photo_url)}>${m.photo_url?"":esc(ini(m.name))}</div></div>
+    <h3>${esc(m.name)}</h3><div class="role">${esc(m.role||"")}</div><div class="loc">${esc(m.location||"")}${m.category?"　・　"+esc(m.category):""}</div>
+    ${m.bio?`<div class="row"><div class="k">紹介</div><div class="v">${esc(m.bio)}</div></div>`:""}
+    ${m.give?`<div class="row"><div class="k">提供できること・教えられること</div><div class="v">${esc(m.give)}</div></div>`:""}
+    ${m.target?`<div class="row"><div class="k">提供したい相手</div><div class="v">${esc(m.target)}</div></div>`:""}
+    ${m.want?`<div class="row"><div class="k">求めていること</div><div class="v">${esc(m.want)}</div></div>`:""}
+    ${m.abroad?`<div class="row"><div class="k">海外販売実績</div><div class="v">${esc(m.abroad)}</div></div>`:""}
+    <div class="mlinks">${m.web?`<a href="${/^https?:/.test(m.web)?esc(m.web):'https://'+esc(m.web)}" target="_blank">${esc(m.web)}</a>`:""}${m.sns?`<a>${esc(m.sns)}</a>`:""}</div>`;
+  $("modal").classList.add("on");
+}
+function closeModal(){ $("modal").classList.remove("on"); }
+$("modal").onclick=e=>{ if(e.target.id==="modal")closeModal(); };
+
+function linkify(t){return esc(t).replace(/(https?:\/\/[^\s]+)/g,'<a href="$1" target="_blank">$1</a>');}
+function renderBoard(){
+  chipRow($("bfilters"),BOARD_CATS,bFilter,c=>{bFilter=c;renderBoard();});
+  const q=($("bsearch").value||"").trim();
+  const list=POSTS.filter(p=>(bFilter==="すべて"||p.category===bFilter)&&(!q||((p.title||"")+(p.body||"")+((p.author&&p.author.name)||"")).includes(q)));
+  const f=$("feed");
+  if(!list.length){f.innerHTML='<div class="empty">投稿がありません。最初の投稿をしてみましょう。</div>';return;}
+  f.innerHTML=list.map(p=>{
+    const an=(p.author&&p.author.name)||"メンバー", ap=p.author&&p.author.photo_url;
+    const cm=COMMENTS.filter(c=>c.post_id===p.id);
+    const likes=LIKES.filter(l=>l.post_id===p.id); const liked=likes.some(l=>l.user_id===currentUid());
+    return `<div class="post">
+      <div class="ph"><div class="who"><span class="avs" ${avStyle(ap)}>${ap?"":esc(ini(an))}</span><span class="nm">${esc(an)}</span><span class="pcat b-${p.category}">${p.category}</span></div><span class="when">${fmt(p.created_at)}</span></div>
+      <h4>${esc(p.title)}</h4>
+      <div class="body">${linkify(p.body||"")}${p.url?`<br><a href="${esc(p.url)}" target="_blank">${esc(p.url)}</a>`:""}</div>
+      <div class="act"><button class="${liked?'liked':''}" onclick="toggleLike('${p.id}')">${liked?'♥':'♡'} ${likes.length}</button><button>💬 ${cm.length}</button></div>
+      <div class="cmts">${cm.map(c=>`<div class="cmt"><div class="ch"><span class="nm">${esc((c.author&&c.author.name)||'メンバー')}</span><span class="wh">${fmt(c.created_at)}</span></div><div class="tx">${esc(c.body)}</div></div>`).join("")}</div>
+      <div class="creply"><input id="ci_${p.id}" placeholder="コメントを書く"><button onclick="addComment('${p.id}')">送信</button></div>
+    </div>`;
+  }).join("");
+}
+function currentUid(){ return sbUser?sbUser.id:null; }
+let sbUser=null;
+
+async function addPost(){
+  const t=$("ptitle").value.trim(), b=$("pbody").value.trim();
+  if(!t&&!b){ alert("タイトルか内容を入力してください。"); return; }
+  $("postBtn").disabled=true;
+  const { error }=await sb.from("posts").insert({ author_id:ME.id, category:$("pcat").value, title:t||"(無題)", body:b, url:$("purl").value.trim()||null });
+  $("postBtn").disabled=false;
+  if(error){ alert("投稿に失敗しました："+error.message); return; }
+  $("ptitle").value="";$("pbody").value="";$("purl").value=""; bFilter="すべて"; await loadBoard();
+}
+async function addComment(pid){
+  const el=$("ci_"+pid); const v=el.value.trim(); if(!v)return;
+  const { error }=await sb.from("comments").insert({ post_id:pid, author_id:ME.id, body:v });
+  if(error){ alert("コメントに失敗しました："+error.message); return; }
+  await loadBoard();
+}
+async function toggleLike(pid){
+  const liked=LIKES.some(l=>l.post_id===pid&&l.user_id===currentUid());
+  if(liked) await sb.from("post_likes").delete().eq("post_id",pid).eq("user_id",currentUid());
+  else await sb.from("post_likes").insert({ post_id:pid, user_id:currentUid() });
+  await loadBoard();
+}
+
+function renderMedia(){
+  const countries=["すべて",...Array.from(new Set(RESOURCES.map(r=>r.country)))];
+  chipRow($("cfilters"),countries,cFilter,c=>{cFilter=c;renderMedia();});
+  const list=cFilter==="すべて"?RESOURCES:RESOURCES.filter(r=>r.country===cFilter);
+  const byC={}; list.forEach(r=>{(byC[r.country]=byC[r.country]||[]).push(r);});
+  $("mediawrap").innerHTML=Object.keys(byC).map(country=>`<div class="countryblock"><h3>${esc(country)}</h3><div class="mcards">${byC[country].map(m=>`
+    <div class="media">${/最優先/.test(m.priority||"")?'<span class="star">⭐ 最優先</span>':''}<div class="mn">${esc(m.name)}</div><div class="memo">${esc(m.memo||"")}</div>${m.url&&m.url!=="#"?`<a class="go" href="${esc(m.url)}" target="_blank">サイトを見る →</a>`:'<span class="go" style="color:var(--muted)">URL準備中</span>'}</div>`).join("")}</div></div>`).join("");
+}
+
+function renderEvents(){
+  const MON=["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
+  const W=["日","月","火","水","木","金","土"];
+  $("eventlist").innerHTML=EVENTS.map(ev=>{
+    let m="—",d="—",w="予定";
+    if(ev.event_date){const dt=new Date(ev.event_date+"T00:00:00");m=MON[dt.getMonth()];d=dt.getDate();w=W[dt.getDay()];}
+    const going=RSVPS.some(r=>r.event_id===ev.id&&r.user_id===currentUid());
+    const cnt=RSVPS.filter(r=>r.event_id===ev.id).length;
+    return `<div class="event"><div class="date"><div class="m">${m}</div><div class="d">${d}</div><div class="w">${w}</div></div>
+      <div class="ev-body"><h4>${esc(ev.title)}</h4><div class="meta">${esc([ev.time_label,ev.place].filter(Boolean).join(" ／ "))}</div><p>${esc(ev.description||"")}</p>
+      <button class="rsvp ${going?'on':''}" onclick="toggleRsvp('${ev.id}')">${going?'参加表明ずみ ✓':'参加する'}${cnt?'（'+cnt+'）':''}</button></div></div>`;
+  }).join("")||'<div class="empty">予定されているイベントはありません。</div>';
+}
+async function toggleRsvp(eid){
+  const going=RSVPS.some(r=>r.event_id===eid&&r.user_id===currentUid());
+  if(going) await sb.from("event_rsvps").delete().eq("event_id",eid).eq("user_id",currentUid());
+  else await sb.from("event_rsvps").insert({ event_id:eid, user_id:currentUid() });
+  await loadEvents();
+}
+function openEventCreate(){
+  $("modalbox").innerHTML=`<button class="x" onclick="closeModal()">×</button><h3>イベントを立てる</h3><div style="height:14px"></div>
+    <div class="fld"><label>タイトル</label><input id="ev_t"></div>
+    <div class="fld"><label>日付</label><input id="ev_d" type="date"></div>
+    <div class="fld"><label>時間（任意）</label><input id="ev_time" placeholder="例：19:00–21:00"></div>
+    <div class="fld"><label>場所／形式（任意）</label><input id="ev_place" placeholder="例：オンライン＋オフライン"></div>
+    <div class="fld"><label>内容</label><textarea id="ev_desc"></textarea></div>
+    <button class="btn" onclick="saveEvent()">作成する</button>`;
+  $("modal").classList.add("on");
+}
+async function saveEvent(){
+  const t=$("ev_t").value.trim(); if(!t){alert("タイトルを入力してください。");return;}
+  const { error }=await sb.from("events").insert({ created_by:ME.id, title:t, event_date:$("ev_d").value||null, time_label:$("ev_time").value.trim()||null, place:$("ev_place").value.trim()||null, description:$("ev_desc").value.trim()||null });
+  if(error){alert("作成に失敗しました："+error.message);return;}
+  closeModal(); await loadEvents(); switchTab("events");
+}
+
+function openProfileEdit(){
+  const m=ME||{}; const cats=["","宿泊","サービス","物販","飲食","コンサル","その他"];
+  $("modalbox").innerHTML=`<button class="x" onclick="closeModal()">×</button><h3>自己紹介の編集</h3><div style="height:14px"></div>
+    <div class="fld"><label>お名前</label><input id="pf_name" value="${esc(m.name||"")}"></div>
+    <div class="fld"><label>カテゴリ</label><select id="pf_cat">${cats.map(c=>`<option ${m.category===c?"selected":""}>${c}</option>`).join("")}</select></div>
+    <div class="fld"><label>事業名・肩書き</label><input id="pf_role" value="${esc(m.role||"")}"></div>
+    <div class="fld"><label>活動拠点</label><input id="pf_loc" value="${esc(m.location||"")}"></div>
+    <div class="fld"><label>紹介文</label><textarea id="pf_bio">${esc(m.bio||"")}</textarea></div>
+    <div class="fld"><label>提供できること・教えられること</label><textarea id="pf_give">${esc(m.give||"")}</textarea></div>
+    <div class="fld"><label>提供したい相手</label><input id="pf_target" value="${esc(m.target||"")}"></div>
+    <div class="fld"><label>求めていること</label><input id="pf_want" value="${esc(m.want||"")}"></div>
+    <div class="fld"><label>海外販売実績</label><input id="pf_abroad" value="${esc(m.abroad||"")}"></div>
+    <div class="fld"><label>HP・URL</label><input id="pf_web" value="${esc(m.web||"")}" placeholder="example.com"></div>
+    <div class="fld"><label>SNS</label><input id="pf_sns" value="${esc(m.sns||"")}" placeholder="Instagram @..."></div>
+    <div class="fld"><label>顔写真</label><input id="pf_photo" type="file" accept="image/*"></div>
+    <button class="btn" id="pfBtn" onclick="saveProfile()">保存する</button>`;
+  $("modal").classList.add("on");
+}
+async function saveProfile(){
+  $("pfBtn").disabled=true;
+  let photo_url=ME.photo_url||null;
+  const file=$("pf_photo").files[0];
+  if(file){
+    const path=currentUid()+"/"+Date.now()+"_"+file.name.replace(/[^\w.\-]/g,"");
+    const up=await sb.storage.from("avatars").upload(path,file,{upsert:true});
+    if(!up.error){ photo_url=sb.storage.from("avatars").getPublicUrl(path).data.publicUrl; }
+  }
+  const patch={ name:$("pf_name").value.trim()||ME.name, category:$("pf_cat").value||null, role:$("pf_role").value.trim()||null,
+    location:$("pf_loc").value.trim()||null, bio:$("pf_bio").value.trim()||null, give:$("pf_give").value.trim()||null,
+    target:$("pf_target").value.trim()||null, want:$("pf_want").value.trim()||null, abroad:$("pf_abroad").value.trim()||null,
+    web:$("pf_web").value.trim()||null, sns:$("pf_sns").value.trim()||null, photo_url };
+  const { data, error }=await sb.from("profiles").update(patch).eq("id",ME.id).select().single();
+  $("pfBtn").disabled=false;
+  if(error){ alert("保存に失敗しました："+error.message); return; }
+  ME=data; $("meName").textContent=ME.name; if(ME.photo_url)$("meAv").style.backgroundImage=`url('${ME.photo_url}')`; else $("meAv").textContent=ini(ME.name);
+  closeModal(); await loadMembers();
+}
+
+/* ---------- tabs ---------- */
+function switchTab(name){
+  document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("on",x.dataset.tab===name));
+  document.querySelectorAll(".page").forEach(x=>x.classList.toggle("on",x.id===name));
+  window.scrollTo({top:0});
+}
+document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>switchTab(t.dataset.tab));
+
+/* keep sbUser in sync */
+sb.auth.getUser().then(({data})=>{ sbUser=data&&data.user; });
+sb.auth.onAuthStateChange((_e,s)=>{ sbUser=s?s.user:null; });
+
+boot();
+</script>
+</body>
+</html>
