@@ -9,10 +9,10 @@
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600;700&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#f4eee8; --paper:#faf7f2; --paper2:#fbf9f5;
-    --ink:#2b2722; --sub:#5f594e; --muted:#9b9183;
-    --bronze:#826a48; --bronze2:#a3895f; --gold:#b8975a;
-    --line:#e6ded1; --line2:#efe8dc; --chip:#efe7da;
+    --bg:#f2eae0; --paper:#fbf7f1; --paper2:#fcf9f4;
+    --ink:#241f19; --sub:#433c33; --muted:#6c6256;
+    --bronze:#6b5430; --bronze2:#84693f; --gold:#8a6b33;
+    --line:#e3d9c9; --line2:#ede3d5; --chip:#ece1d2;
   }
   *{box-sizing:border-box; margin:0; padding:0;}
   body{font-family:"Jost","Hiragino Kaku Gothic ProN",sans-serif; color:var(--ink); background:var(--bg); font-weight:300; line-height:1.85; -webkit-font-smoothing:antialiased;}
@@ -158,6 +158,67 @@
   .modal .fld{margin-bottom:12px;}
   .footnote{text-align:center; font-size:11px; color:var(--muted); letter-spacing:.06em; padding:30px 0 50px;}
   #loading{min-height:100vh; display:flex; align-items:center; justify-content:center; color:var(--muted); font-size:13px; letter-spacing:.1em;}
+
+  /* ── 読みやすさ調整（濃く・大きく）── */
+  body{font-weight:400;}
+  .brand .mark{font-size:22px;}
+  .brand .by{font-size:12.5px; letter-spacing:.12em; color:var(--bronze); font-weight:500;}
+  #login .tagline{font-size:14px; letter-spacing:.16em; color:var(--bronze); font-weight:500; margin-top:8px;}
+  #login .by{font-size:11.5px; color:var(--muted); margin-top:4px;}
+  #login .lead{font-size:15px; color:var(--sub);}
+  #login input{font-size:16px;}
+  #login .btn{font-size:16px;}
+  #login .note{font-size:12.5px;}
+  .me .nm{font-size:15px;}
+  .me .gho{font-size:12.5px;}
+  .tab{font-size:14.5px;}
+  .tab .en{font-size:10px;}
+  .lede .cap{font-size:12.5px;}
+  .lede h2{font-size:33px;}
+  .lede p{font-size:15.5px; color:var(--sub);}
+  .chip{font-size:14.5px; padding:9px 18px; color:var(--sub);}
+  .search input{font-size:16px;}
+  .mcard{padding:30px 24px 26px;}
+  .mcard .cat{font-size:13px; font-weight:600; letter-spacing:.02em; padding:6px 13px; top:14px; right:14px;}
+  .mcard .nm{font-size:22px;}
+  .mcard .role{font-size:14.5px; color:var(--bronze); font-weight:500;}
+  .mcard .loc{font-size:13px;}
+  .mcard .bio{font-size:14.5px; color:var(--sub); min-height:50px; line-height:1.85;}
+  .mcard .links span{font-size:13px;}
+  .composer h3{font-size:19px;}
+  .fld label{font-size:12.5px;}
+  .fld select,.fld input,.fld textarea{font-size:15px;}
+  .btn{font-size:15px;}
+  .post{padding:24px 26px;}
+  .post .nm{font-size:14.5px;}
+  .post .when{font-size:12.5px;}
+  .pcat{font-size:12.5px; font-weight:600; padding:5px 12px;}
+  .post h4{font-size:20px;}
+  .post .body{font-size:15.5px; color:var(--sub); line-height:1.95;}
+  .post .act button{font-size:13.5px;}
+  .cmt .ch .nm{font-size:13px;}
+  .cmt .ch .wh{font-size:11.5px;}
+  .cmt .tx{font-size:14px; color:var(--sub);}
+  .creply input{font-size:14px;}
+  .creply button{font-size:13.5px;}
+  .syncnote{font-size:13px;}
+  .countryblock h3{font-size:18px;}
+  .media .mn{font-size:16.5px;}
+  .media .memo{font-size:14px; color:var(--sub);}
+  .media .go{font-size:12.5px;}
+  .event .date .d{font-size:34px;}
+  .event .date .m{font-size:12px;}
+  .event .ev-body h4{font-size:20px;}
+  .event .ev-body .meta{font-size:13px;}
+  .event .ev-body p{font-size:14.5px; color:var(--sub);}
+  .event .ev-body .rsvp{font-size:13px;}
+  .addbtn{font-size:13.5px;}
+  .modal h3{font-size:23px;}
+  .modal .row .k{font-size:12px;}
+  .modal .row .v{font-size:15px; color:var(--sub);}
+  .modal .role{font-size:14px;}
+  .modal .loc{font-size:13px;}
+  .footnote{font-size:12px;}
 </style>
 </head>
 <body>
@@ -168,6 +229,7 @@
 <div id="login" class="hidden">
   <div class="card">
     <div class="mark serif">CLUB BORDERLESS</div>
+    <div class="tagline">〜 インバウンド・アウトバウンド 〜</div>
     <div class="by">by Holland Village Members Club ｜ 起業家ワークショップ</div>
     <p class="lead">メンバー限定のコミュニティです。<br>登録メールアドレスにログイン用のリンクをお送りします。</p>
     <input id="loginEmail" type="email" placeholder="メールアドレス" autocomplete="email">
@@ -183,7 +245,7 @@
     <div class="top-in">
       <div class="brand">
         <span class="mark serif">CLUB BORDERLESS</span>
-        <span class="by">by Holland Village Members Club ｜ 起業家ワークショップ</span>
+        <span class="by">〜 インバウンド・アウトバウンド 〜</span>
       </div>
       <div class="me">
         <span class="av" id="meAv"></span>
