@@ -240,7 +240,11 @@
   .shopmsg p{font-size:15px; color:var(--sub); line-height:2;}
   .shopmsg p+p{margin-top:12px;}
   .shopform{background:var(--paper); border:1px solid var(--line2); border-radius:8px; padding:26px 24px;}
-  .shopform h3{font-size:19px; margin-bottom:18px;}
+  .shopform h3{font-size:19px; margin-bottom:8px;}
+  .shopform-note{font-size:13px; color:var(--muted); margin-bottom:18px; line-height:1.8;}
+  .fgroup{font-size:12px; letter-spacing:.14em; color:var(--bronze); font-weight:600; margin:22px 0 12px; padding-bottom:7px; border-bottom:1px solid var(--line2);}
+  .fgroup:first-of-type{margin-top:6px;}
+  .shopform input[type=file]{font-size:13px; color:var(--sub); padding:9px 12px;}
   .shopdone{background:var(--paper); border:1px solid var(--line2); border-radius:8px; padding:40px 30px; text-align:center; font-size:15.5px; color:var(--sub); line-height:2;}
 </style>
 </head>
@@ -343,11 +347,24 @@
       </div>
       <div class="shopform" id="shopform">
         <h3 class="serif">出品を希望する</h3>
+        <p class="shopform-note">DEEP JAPANの商品ページを作るための情報です。分かる範囲でOK、あとから調整もできます。</p>
+        <div class="fgroup">商品について</div>
+        <div class="fld"><label>ブランド名</label><input id="sh_brand"></div>
+        <div class="fld"><label>商品・体験の名前</label><input id="sh_pname" placeholder="例：着物リメイクのドレス＆ジャケット"></div>
+        <div class="fld"><label>お届け方法</label><select id="sh_delivery"><option>お部屋へお届け</option><option>発送</option><option>滞在中の体験</option></select></div>
+        <div class="fld"><label>紹介文（魅力が伝わるように）</label><textarea id="sh_lead" placeholder="例：伝統の美をまとい、世界へ。一点ものの着物地から仕立てる、サステナブルなドレスとジャケットです。"></textarea></div>
+        <div class="fgroup">つくり手について</div>
         <div class="fld"><label>お名前</label><input id="sh_name"></div>
-        <div class="fld"><label>事業・ブランド名</label><input id="sh_brand"></div>
-        <div class="fld"><label>販売したい商品・体験</label><textarea id="sh_product" placeholder="例：自然栽培米のギフト／着物リメイクのドレス／書道体験 など"></textarea></div>
-        <div class="fld"><label>商品のURL・SNS（任意）</label><input id="sh_url" placeholder="https://"></div>
-        <div class="fld"><label>ひとこと（任意）</label><textarea id="sh_note"></textarea></div>
+        <div class="fld"><label>肩書き・活動拠点</label><input id="sh_role" placeholder="例：OMOMUKI ／ 岐阜"></div>
+        <div class="fld"><label>自己紹介</label><textarea id="sh_bio"></textarea></div>
+        <div class="fld"><label>ひとことメッセージ</label><input id="sh_quote" placeholder="例：伝統の美をまとい、世界へ羽ばたく。"></div>
+        <div class="fgroup">リンク</div>
+        <div class="fld"><label>Web・HP</label><input id="sh_url" placeholder="https://"></div>
+        <div class="fld"><label>Instagram</label><input id="sh_instagram" placeholder="@... または URL"></div>
+        <div class="fld"><label>YouTube（任意）</label><input id="sh_youtube" placeholder="https://"></div>
+        <div class="fgroup">写真</div>
+        <div class="fld"><label>商品・つくり手の写真（最大5枚）</label><input id="sh_photos" type="file" accept="image/*" multiple></div>
+        <div class="fld"><label>連絡事項（任意）</label><textarea id="sh_note"></textarea></div>
         <button class="btn" id="shBtn" onclick="submitShop()">送信する</button>
       </div>
       <div class="shopdone" id="shopdone" style="display:none"></div>
@@ -595,17 +612,36 @@ async function saveProfile(){
 
 /* ---------- shop (DEEP JAPAN) ---------- */
 async function submitShop(){
-  const name=$("sh_name").value.trim(), brand=$("sh_brand").value.trim(), product=$("sh_product").value.trim();
-  if(!name && !product){ alert("お名前か、商品・体験の内容を入力してください。"); return; }
-  $("shBtn").disabled=true;
-  const { error }=await sb.from("shop_requests").insert({ profile_id: ME?ME.id:null, name, brand, product, url:$("sh_url").value.trim()||null, note:$("sh_note").value.trim()||null });
-  $("shBtn").disabled=false;
+  const v=id=>($(id)?$(id).value.trim():"");
+  if(!v("sh_brand") && !v("sh_pname") && !v("sh_name")){ alert("ブランド名・商品名・お名前のいずれかを入力してください。"); return; }
+  $("shBtn").disabled=true; $("shBtn").textContent="送信中…";
+  let photos=[];
+  const files=$("sh_photos").files;
+  for(let i=0;i<Math.min(files.length,5);i++){
+    const f=files[i];
+    const path=(currentUid()||"anon")+"/"+Date.now()+"_"+i+"_"+f.name.replace(/[^\w.\-]/g,"");
+    const up=await sb.storage.from("submissions").upload(path,f,{upsert:true});
+    if(!up.error){ photos.push(sb.storage.from("submissions").getPublicUrl(path).data.publicUrl); }
+  }
+  const { error }=await sb.from("shop_requests").insert({
+    profile_id: ME?ME.id:null,
+    brand:v("sh_brand")||null, product_name:v("sh_pname")||null, delivery:$("sh_delivery").value,
+    lead:v("sh_lead")||null, name:v("sh_name")||null, maker_role:v("sh_role")||null,
+    bio:v("sh_bio")||null, quote:v("sh_quote")||null,
+    url:v("sh_url")||null, instagram:v("sh_instagram")||null, youtube:v("sh_youtube")||null,
+    photos: photos.length?photos:null, note:v("sh_note")||null
+  });
+  $("shBtn").disabled=false; $("shBtn").textContent="送信する";
   if(error){ alert("送信に失敗しました："+error.message); return; }
   $("shopform").style.display="none";
   $("shopdone").style.display="block";
   $("shopdone").innerHTML="ありがとうございます。<br>内容を確認のうえ、DEEP JAPANへの掲載について<br>担当からご連絡します。";
 }
-function prefillShop(){ if($("sh_name")&&ME){ if(!$("sh_name").value)$("sh_name").value=ME.name||""; if(!$("sh_brand").value)$("sh_brand").value=ME.role||""; } }
+function prefillShop(){ if(!ME)return;
+  if($("sh_name")&&!$("sh_name").value)$("sh_name").value=ME.name||"";
+  if($("sh_brand")&&!$("sh_brand").value)$("sh_brand").value=ME.role||"";
+  if($("sh_role")&&!$("sh_role").value)$("sh_role").value=[ME.role,ME.location].filter(Boolean).join(" ／ ");
+}
 
 /* ---------- tabs ---------- */
 function switchTab(name){
