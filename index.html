@@ -251,6 +251,11 @@
   .fgroup{font-size:12px; letter-spacing:.14em; color:var(--bronze); font-weight:600; margin:22px 0 12px; padding-bottom:7px; border-bottom:1px solid var(--line2);}
   .fgroup:first-of-type{margin-top:6px;}
   .shopform input[type=file]{font-size:13px; color:var(--sub); padding:9px 12px;}
+  .shopmore{margin:6px 0 4px; border-top:1px solid var(--line2); padding-top:14px;}
+  .shopmore>summary{cursor:pointer; font-size:13.5px; letter-spacing:.04em; color:var(--bronze); font-weight:600; margin-bottom:14px; list-style:none;}
+  .shopmore>summary::-webkit-details-marker{display:none;}
+  .shopmore>summary::before{content:"＋ ";}
+  .shopmore[open]>summary::before{content:"− ";}
   .shopdone{background:var(--paper); border:1px solid var(--line2); border-radius:8px; padding:40px 30px; text-align:center; font-size:15.5px; color:var(--sub); line-height:2;}
 </style>
 </head>
@@ -355,25 +360,25 @@
         <p>登録作業はこちらで行いますので、「載せてほしい！」という方は、下のフォームからご連絡ください。</p>
       </div>
       <div class="shopform" id="shopform">
-        <h3 class="serif">出品を希望する</h3>
-        <p class="shopform-note">DEEP JAPANの商品ページを作るための情報です。分かる範囲でOK、あとから調整もできます。</p>
-        <div class="fgroup">商品について</div>
-        <div class="fld"><label>ブランド名</label><input id="sh_brand"></div>
-        <div class="fld"><label>商品・体験の名前</label><input id="sh_pname" placeholder="例：着物リメイクのドレス＆ジャケット"></div>
-        <div class="fld"><label>お届け方法</label><select id="sh_delivery"><option>お部屋へお届け</option><option>発送</option><option>滞在中の体験</option></select></div>
-        <div class="fld"><label>紹介文（魅力が伝わるように）</label><textarea id="sh_lead" placeholder="例：伝統の美をまとい、世界へ。一点ものの着物地から仕立てる、サステナブルなドレスとジャケットです。"></textarea></div>
-        <div class="fgroup">つくり手について</div>
+        <h3 class="serif">出品に興味がある</h3>
+        <p class="shopform-note">まずは軽くエントリーを。料金や販売方法は、これから一緒に詰めていきます。写真や動画など詳しい内容は、進める方に後ほど個別にご案内します。書ける範囲で大丈夫です。</p>
         <div class="fld"><label>お名前</label><input id="sh_name"></div>
-        <div class="fld"><label>肩書き・活動拠点</label><input id="sh_role" placeholder="例：OMOMUKI ／ 岐阜"></div>
-        <div class="fld"><label>自己紹介</label><textarea id="sh_bio"></textarea></div>
-        <div class="fld"><label>ひとことメッセージ</label><input id="sh_quote" placeholder="例：伝統の美をまとい、世界へ羽ばたく。"></div>
-        <div class="fgroup">リンク</div>
-        <div class="fld"><label>Web・HP</label><input id="sh_url" placeholder="https://"></div>
-        <div class="fld"><label>Instagram</label><input id="sh_instagram" placeholder="@... または URL"></div>
-        <div class="fld"><label>YouTube（任意）</label><input id="sh_youtube" placeholder="https://"></div>
-        <div class="fgroup">写真</div>
-        <div class="fld"><label>商品・つくり手の写真（最大5枚）</label><input id="sh_photos" type="file" accept="image/*" multiple></div>
-        <div class="fld"><label>連絡事項（任意）</label><textarea id="sh_note"></textarea></div>
+        <div class="fld"><label>事業・ブランド名</label><input id="sh_brand"></div>
+        <div class="fld"><label>何を売りたい・PRしたいですか？（ざっくりでOK）</label><textarea id="sh_lead" placeholder="例：自然栽培米のギフト／着物リメイクのドレス／書道体験 など"></textarea></div>
+        <div class="fld"><label>連絡先（メール・SNSなど、ご連絡が取れるもの）</label><input id="sh_contact"></div>
+        <details class="shopmore">
+          <summary>詳しく書ける方はこちら（任意・後からでもOK）</summary>
+          <div class="fld"><label>商品・体験の名前</label><input id="sh_pname"></div>
+          <div class="fld"><label>お届け方法</label><select id="sh_delivery"><option value="">（未定）</option><option>お部屋へお届け</option><option>発送</option><option>滞在中の体験</option></select></div>
+          <div class="fld"><label>肩書き・活動拠点</label><input id="sh_role" placeholder="例：OMOMUKI ／ 岐阜"></div>
+          <div class="fld"><label>自己紹介（つくり手）</label><textarea id="sh_bio"></textarea></div>
+          <div class="fld"><label>ひとことメッセージ</label><input id="sh_quote"></div>
+          <div class="fld"><label>Web・HP</label><input id="sh_url" placeholder="https://"></div>
+          <div class="fld"><label>Instagram</label><input id="sh_instagram" placeholder="@... または URL"></div>
+          <div class="fld"><label>YouTube動画（横向き1〜2分の想い・任意／後から追加OK）</label><input id="sh_youtube" placeholder="https://"></div>
+          <div class="fld"><label>商品・つくり手の写真（最大5枚）</label><input id="sh_photos" type="file" accept="image/*" multiple></div>
+        </details>
+        <div class="fld"><label>ひとこと・質問など（任意）</label><textarea id="sh_note"></textarea></div>
         <button class="btn" id="shBtn" onclick="submitShop()">送信する</button>
       </div>
       <div class="shopdone" id="shopdone" style="display:none"></div>
@@ -622,7 +627,7 @@ async function saveProfile(){
 /* ---------- shop (DEEP JAPAN) ---------- */
 async function submitShop(){
   const v=id=>($(id)?$(id).value.trim():"");
-  if(!v("sh_brand") && !v("sh_pname") && !v("sh_name")){ alert("ブランド名・商品名・お名前のいずれかを入力してください。"); return; }
+  if(!v("sh_brand") && !v("sh_name") && !v("sh_lead")){ alert("お名前・事業名・売りたいもの のいずれかを入力してください。"); return; }
   $("shBtn").disabled=true; $("shBtn").textContent="送信中…";
   let photos=[];
   const files=$("sh_photos").files;
@@ -634,8 +639,8 @@ async function submitShop(){
   }
   const { error }=await sb.from("shop_requests").insert({
     profile_id: ME?ME.id:null,
-    brand:v("sh_brand")||null, product_name:v("sh_pname")||null, delivery:$("sh_delivery").value,
-    lead:v("sh_lead")||null, name:v("sh_name")||null, maker_role:v("sh_role")||null,
+    brand:v("sh_brand")||null, product_name:v("sh_pname")||null, delivery:(($("sh_delivery")&&$("sh_delivery").value)||null),
+    lead:v("sh_lead")||null, contact:v("sh_contact")||null, name:v("sh_name")||null, maker_role:v("sh_role")||null,
     bio:v("sh_bio")||null, quote:v("sh_quote")||null,
     url:v("sh_url")||null, instagram:v("sh_instagram")||null, youtube:v("sh_youtube")||null,
     photos: photos.length?photos:null, note:v("sh_note")||null
