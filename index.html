@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Club Borderless</title>
+<link rel="icon" href="cb-favicon.png">
+<link rel="apple-touch-icon" href="cb-favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600;700&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
@@ -164,6 +166,10 @@
   .brand .mark{font-size:22px;}
   .brand .by{font-size:12.5px; letter-spacing:.12em; color:var(--bronze); font-weight:500;}
   .brand .byhvmc{font-size:10.5px; letter-spacing:.08em; color:var(--muted); margin-top:2px;}
+  .brand{flex-direction:row; align-items:center; gap:13px;}
+  .brand-mark{height:48px; width:auto; flex:none;}
+  .brand-txt{display:flex; flex-direction:column; gap:3px;}
+  .login-logo{width:min(320px,76%); height:auto; display:block; margin:0 auto 4px;}
   header.top{position:static;}
   nav.tabs{top:0;}
   .footnote{display:flex; flex-direction:column; gap:5px; align-items:center; padding:36px 24px 54px;}
@@ -255,7 +261,7 @@
 <!-- LOGIN -->
 <div id="login" class="hidden">
   <div class="card">
-    <div class="mark serif">CLUB BORDERLESS</div>
+    <img class="login-logo" src="cb-logo.png" alt="CLUB BORDERLESS">
     <div class="tagline">〜 インバウンド・アウトバウンド 〜</div>
     <div class="by">by Holland Village Members Club ｜ 起業家ワークショップ</div>
     <p class="lead">メンバー限定のコミュニティです。<br>登録メールアドレスにログイン用のリンクをお送りします。</p>
@@ -271,9 +277,12 @@
   <header class="top">
     <div class="top-in">
       <div class="brand">
-        <span class="mark serif">CLUB BORDERLESS</span>
-        <span class="by">〜 インバウンド・アウトバウンド 〜</span>
-        <span class="byhvmc">by Holland Village Members Club ｜ 起業家ワークショップ</span>
+        <img class="brand-mark" src="cb-mark.png" alt="">
+        <div class="brand-txt">
+          <span class="mark serif">CLUB BORDERLESS</span>
+          <span class="by">〜 インバウンド・アウトバウンド 〜</span>
+          <span class="byhvmc">by Holland Village Members Club ｜ 起業家ワークショップ</span>
+        </div>
       </div>
       <div class="me">
         <span class="av" id="meAv"></span>
