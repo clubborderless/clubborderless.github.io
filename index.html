@@ -219,6 +219,21 @@
   .modal .role{font-size:14px;}
   .modal .loc{font-size:13px;}
   .footnote{font-size:12px;}
+
+  /* ── DEEP JAPAN（ショップ）タブ ── */
+  .shopwrap{max-width:680px; margin:0 auto; display:flex; flex-direction:column; gap:26px;}
+  .shopsite{display:flex; align-items:center; justify-content:space-between; gap:22px; background:linear-gradient(135deg,#2b2722,#3d362c); color:#f4eee8; border-radius:10px; padding:30px 32px; text-decoration:none;}
+  .shopsite .ss-cap{font-size:11px; letter-spacing:.2em; color:var(--gold); text-transform:uppercase;}
+  .shopsite .ss-name{font-size:27px; letter-spacing:.18em; margin:7px 0 11px;}
+  .shopsite .ss-desc{font-size:14px; color:#d8cfc0; line-height:1.85;}
+  .shopsite .ss-go{flex:none; border:1px solid #b8975a; color:#e7d4ad; padding:12px 19px; border-radius:30px; font-size:13.5px; letter-spacing:.08em; white-space:nowrap;}
+  .shopsite:hover .ss-go{background:#b8975a; color:#2b2722;}
+  @media(max-width:560px){.shopsite{flex-direction:column; align-items:flex-start;}}
+  .shopmsg p{font-size:15px; color:var(--sub); line-height:2;}
+  .shopmsg p+p{margin-top:12px;}
+  .shopform{background:var(--paper); border:1px solid var(--line2); border-radius:8px; padding:26px 24px;}
+  .shopform h3{font-size:19px; margin-bottom:18px;}
+  .shopdone{background:var(--paper); border:1px solid var(--line2); border-radius:8px; padding:40px 30px; text-align:center; font-size:15.5px; color:var(--sub); line-height:2;}
 </style>
 </head>
 <body>
@@ -261,6 +276,7 @@
     <button class="tab" data-tab="board">掲示板<span class="en">BOARD</span></button>
     <button class="tab" data-tab="useful">お役立ち<span class="en">RESOURCES</span></button>
     <button class="tab" data-tab="events">イベント<span class="en">EVENTS</span></button>
+    <button class="tab" data-tab="shop">DEEP JAPAN<span class="en">SHOP</span></button>
   </div></nav>
 
   <section class="page on" id="members"><div class="wrap">
@@ -299,6 +315,34 @@
     <div class="lede"><span class="cap">Events</span><h2 class="serif">イベント</h2><p>交流会や勉強会のお知らせ。参加表明もここから。</p></div>
     <div class="events" id="eventlist"></div>
     <div class="addbar"><button class="addbtn" onclick="openEventCreate()">＋ イベントを立てる</button></div>
+  </div></section>
+
+  <section class="page" id="shop"><div class="wrap">
+    <div class="lede"><span class="cap">DEEP JAPAN</span><h2 class="serif">あなたの商品を、インバウンドへ</h2><p>宿泊施設やお店で、あなたの商品や体験をPR・販売できる場をつくっています。</p></div>
+    <div class="shopwrap">
+      <a class="shopsite" href="https://deepjapan.jp/" target="_blank" rel="noopener">
+        <div class="ss-l">
+          <div class="ss-cap">物販サイト</div>
+          <div class="ss-name serif">DEEP JAPAN</div>
+          <div class="ss-desc">この土地の作り手がつくる、日本のいいもの。泊まる時間に出会い、そのままお客様のもとへ。</div>
+        </div>
+        <div class="ss-go">サイトを見る →</div>
+      </a>
+      <div class="shopmsg">
+        <p>インバウンド向けに商品を販売してみたい方へ。宿泊施設やお店などで、あなたの商品や体験をPR・販売できる環境を構築中です。</p>
+        <p>登録作業はこちらで行いますので、「載せてほしい！」という方は、下のフォームからご連絡ください。</p>
+      </div>
+      <div class="shopform" id="shopform">
+        <h3 class="serif">出品を希望する</h3>
+        <div class="fld"><label>お名前</label><input id="sh_name"></div>
+        <div class="fld"><label>事業・ブランド名</label><input id="sh_brand"></div>
+        <div class="fld"><label>販売したい商品・体験</label><textarea id="sh_product" placeholder="例：自然栽培米のギフト／着物リメイクのドレス／書道体験 など"></textarea></div>
+        <div class="fld"><label>商品のURL・SNS（任意）</label><input id="sh_url" placeholder="https://"></div>
+        <div class="fld"><label>ひとこと（任意）</label><textarea id="sh_note"></textarea></div>
+        <button class="btn" id="shBtn" onclick="submitShop()">送信する</button>
+      </div>
+      <div class="shopdone" id="shopdone" style="display:none"></div>
+    </div>
   </div></section>
 
   <div class="footnote">CLUB BORDERLESS　｜　by Holland Village Members Club ｜ 起業家ワークショップ</div>
@@ -344,6 +388,7 @@ async function ensureMe(session){
   $("meName").textContent=ME?ME.name:"";
   $("meAv").textContent=ME&&!ME.photo_url?ini(ME.name):"";
   if(ME&&ME.photo_url)$("meAv").style.backgroundImage=`url('${ME.photo_url}')`;
+  prefillShop();
 }
 async function sendLink(){
   const email=$("loginEmail").value.trim();
@@ -534,6 +579,20 @@ async function saveProfile(){
   ME=data; $("meName").textContent=ME.name; if(ME.photo_url)$("meAv").style.backgroundImage=`url('${ME.photo_url}')`; else $("meAv").textContent=ini(ME.name);
   closeModal(); await loadMembers();
 }
+
+/* ---------- shop (DEEP JAPAN) ---------- */
+async function submitShop(){
+  const name=$("sh_name").value.trim(), brand=$("sh_brand").value.trim(), product=$("sh_product").value.trim();
+  if(!name && !product){ alert("お名前か、商品・体験の内容を入力してください。"); return; }
+  $("shBtn").disabled=true;
+  const { error }=await sb.from("shop_requests").insert({ profile_id: ME?ME.id:null, name, brand, product, url:$("sh_url").value.trim()||null, note:$("sh_note").value.trim()||null });
+  $("shBtn").disabled=false;
+  if(error){ alert("送信に失敗しました："+error.message); return; }
+  $("shopform").style.display="none";
+  $("shopdone").style.display="block";
+  $("shopdone").innerHTML="ありがとうございます。<br>内容を確認のうえ、DEEP JAPANへの掲載について<br>担当からご連絡します。";
+}
+function prefillShop(){ if($("sh_name")&&ME){ if(!$("sh_name").value)$("sh_name").value=ME.name||""; if(!$("sh_brand").value)$("sh_brand").value=ME.role||""; } }
 
 /* ---------- tabs ---------- */
 function switchTab(name){
