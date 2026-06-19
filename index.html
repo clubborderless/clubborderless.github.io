@@ -339,7 +339,7 @@
   </div></section>
 
   <section class="page" id="events"><div class="wrap">
-    <div class="lede"><span class="cap">Events</span><h2 class="serif">イベント</h2><p>交流会や勉強会のお知らせ。参加表明もここから。</p></div>
+    <div class="lede"><span class="cap">Events</span><h2 class="serif">イベント</h2><p>交流会や勉強会のお知らせ。参加はFacebookの限定ページから受け付けます。</p></div>
     <div class="events" id="eventlist"></div>
     <div class="addbar"><button class="addbtn" onclick="openEventCreate()">＋ イベントを立てる</button></div>
   </div></section>
@@ -556,11 +556,8 @@ function renderEvents(){
   $("eventlist").innerHTML=EVENTS.map(ev=>{
     let m="—",d="—",w="予定";
     if(ev.event_date){const dt=new Date(ev.event_date+"T00:00:00");m=MON[dt.getMonth()];d=dt.getDate();w=W[dt.getDay()];}
-    const going=RSVPS.some(r=>r.event_id===ev.id&&r.user_id===currentUid());
-    const cnt=RSVPS.filter(r=>r.event_id===ev.id).length;
     return `<div class="event"><div class="date"><div class="m">${m}</div><div class="d">${d}</div><div class="w">${w}</div></div>
-      <div class="ev-body"><h4>${esc(ev.title)}</h4><div class="meta">${esc([ev.time_label,ev.place].filter(Boolean).join(" ／ "))}</div><p>${esc(ev.description||"")}</p>
-      <button class="rsvp ${going?'on':''}" onclick="toggleRsvp('${ev.id}')">${going?'参加表明ずみ ✓':'参加する'}${cnt?'（'+cnt+'）':''}</button></div></div>`;
+      <div class="ev-body"><h4>${esc(ev.title)}</h4><div class="meta">${esc([ev.time_label,ev.place].filter(Boolean).join(" ／ "))}</div><p>${esc(ev.description||"")}</p></div></div>`;
   }).join("")||'<div class="empty">予定されているイベントはありません。</div>';
 }
 async function toggleRsvp(eid){
