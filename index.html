@@ -283,17 +283,14 @@
 
   /* ── スマホのヘッダー崩れ対策 ── */
   @media(max-width:560px){
-    .top-in{padding:12px 14px; gap:10px;}
-    .brand{gap:8px; min-width:0; flex:1 1 auto;}
-    .brand-mark{height:32px; width:auto; flex:none;}
-    .brand-txt{min-width:0;}
-    .brand .mark{font-size:14px; letter-spacing:.06em; white-space:nowrap;}
-    .brand .by{display:none;}
-    .brand .byhvmc{display:none;}
-    .me{gap:8px; flex:none;}
-    .me .av{width:32px; height:32px; flex:none;}
-    .me .nm{white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:38vw; font-size:13.5px;}
-    .me .gho{flex:none; padding:6px 10px; font-size:11px; white-space:nowrap;}
+    .top-in{padding:11px 13px; gap:8px; flex-wrap:nowrap;}
+    .brand{gap:0; flex:none;}
+    .brand-mark{height:30px; width:auto; flex:none;}
+    .brand-txt{display:none;}
+    .me{gap:7px; flex:1 1 auto; min-width:0; justify-content:flex-end;}
+    .me .av{width:30px; height:30px; flex:none;}
+    .me .nm{white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-width:0; font-size:13px;}
+    .me .gho{flex:none; padding:6px 9px; font-size:11px; white-space:nowrap;}
   }
 </style>
 </head>
