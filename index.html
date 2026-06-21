@@ -466,7 +466,7 @@
 const sb = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_KEY);
 let ME=null, MEMBERS=[], POSTS=[], COMMENTS=[], LIKES=[], RESOURCES=[], EVENTS=[], RSVPS=[];
 let mFilter="すべて", bFilter="すべて", cFilter="すべて";
-const MEMBER_CATS=["すべて","民泊","宿泊","サービス","物販","飲食","コンサル","その他"];
+const MEMBER_CATS=["すべて","宿泊","サービス","物販","飲食","コンサル","その他"];
 const BOARD_CATS=["すべて","リクエスト","相談","シェア","コラボ募集","お知らせ","雑談"];
 const $=id=>document.getElementById(id);
 const esc=s=>(s==null?"":String(s)).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
@@ -737,7 +737,7 @@ async function saveResource(){
 }
 
 function openProfileEdit(){
-  const m=ME||{}; const cats=["","民泊","宿泊","サービス","物販","飲食","コンサル","その他"];
+  const m=ME||{}; const cats=["","宿泊","サービス","物販","飲食","コンサル","その他"];
   $("modalbox").innerHTML=`<button class="x" onclick="closeModal()">×</button><h3>自己紹介の編集</h3><div style="height:14px"></div>
     <div class="fld"><label>お名前</label><input id="pf_name" value="${esc(m.name||"")}"></div>
     <div class="fld"><label>カテゴリ</label><select id="pf_cat">${cats.map(c=>`<option ${m.category===c?"selected":""}>${c}</option>`).join("")}</select></div>
