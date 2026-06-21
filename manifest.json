@@ -1,0 +1,13 @@
+{
+  "name": "Club Borderless",
+  "short_name": "Club Borderless",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f4eee8",
+  "theme_color": "#f4eee8",
+  "icons": [
+    { "src": "cb-favicon.png?v=2", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "cb-favicon.png?v=2", "sizes": "192x192", "type": "image/png", "purpose": "any" }
+  ]
+}
