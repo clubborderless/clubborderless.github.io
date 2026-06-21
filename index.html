@@ -105,6 +105,7 @@
   .post .nm{font-size:12.5px;} .post .when{font-size:11px; color:var(--muted);}
   .pcat{font-size:9.5px; letter-spacing:.08em; padding:4px 10px; border-radius:20px;}
   .b-リクエスト{background:#f7e4dc; color:#a85c3e;} .b-相談{background:#e7eef4; color:#3f5a73;}
+  .b-理想の宿{background:#efe6d2; color:#8a6b2f;}
   .b-シェア{background:#f5ead9; color:#9a6c2e;} .b-コラボ募集{background:#e6f0e8; color:#3f6a4c;}
   .b-お知らせ{background:#f1e6f0; color:#7c4f78;} .b-雑談{background:#ececea; color:#6a6760;}
   .post h4{font-family:"Shippori Mincho",serif; font-weight:500; font-size:17px; margin:5px 0 7px;}
@@ -260,6 +261,14 @@
   .shopmore[open]>summary::before{content:"− ";}
   .shopdone{background:var(--paper); border:1px solid var(--line2); border-radius:8px; padding:40px 30px; text-align:center; font-size:15.5px; color:var(--sub); line-height:2;}
 
+  /* ── 理想の宿プロジェクトのバナー ── */
+  .innproject{background:linear-gradient(180deg,#efe7d8,#f4eee4); border:1px solid var(--line2); border-radius:10px; padding:26px 26px 24px; margin:6px 0 26px; max-width:760px;}
+  .innproject .ip-cap{font-size:11px; letter-spacing:.22em; color:var(--bronze); font-weight:600; margin-bottom:9px;}
+  .innproject h3{font-family:"Shippori Mincho",serif; font-weight:500; font-size:22px; color:var(--ink); margin-bottom:10px; line-height:1.5;}
+  .innproject p{font-size:14.5px; color:var(--sub); line-height:1.9; margin-bottom:16px;}
+  .innproject .ip-btn{background:var(--bronze); color:#f7f1e7; border:none; font-size:14px; letter-spacing:.06em; padding:12px 24px; border-radius:30px; cursor:pointer;}
+  .innproject .ip-btn:hover{background:var(--gold);}
+
   /* ── スマホのヘッダー崩れ対策 ── */
   @media(max-width:560px){
     .top-in{padding:12px 14px; gap:10px;}
@@ -334,12 +343,18 @@
 
   <section class="page" id="board"><div class="wrap">
     <div class="lede"><span class="cap">Board</span><h2 class="serif">掲示板</h2><p>相談・シェア・コラボ募集・リクエスト。カテゴリを選んで投稿、コメントで会話できます。</p></div>
+    <div class="innproject">
+      <div class="ip-cap">PROJECT</div>
+      <h3 class="serif">みんなで“理想の宿”を作っちゃおうプロジェクト</h3>
+      <p>「こんな宿があったら泊まりたい！」を自由に書ける場所です。設備でも、過ごし方でも、サービスでも、思いつきでもOK。集まったアイデアを、いつか本当に形にするのが目標です。</p>
+      <button class="ip-btn" onclick="startIdealInn()">理想の宿のアイデアを書く</button>
+    </div>
     <div class="filters" id="bfilters"></div>
     <div class="search"><input id="bsearch" placeholder="投稿を検索" oninput="renderBoard()"></div>
     <div class="board">
       <div class="composer">
         <h3 class="serif">投稿する</h3>
-        <div class="fld"><label>カテゴリ</label><select id="pcat"><option>リクエスト</option><option>相談</option><option>シェア</option><option>コラボ募集</option><option>お知らせ</option><option>雑談</option></select></div>
+        <div class="fld"><label>カテゴリ</label><select id="pcat"><option>リクエスト</option><option>理想の宿</option><option>相談</option><option>シェア</option><option>コラボ募集</option><option>お知らせ</option><option>雑談</option></select></div>
         <div class="fld"><label>タイトル</label><input id="ptitle" placeholder="例：海外発送のコツを知りたい"></div>
         <div class="fld"><label>内容</label><textarea id="pbody" placeholder="相談・シェア・募集したいことを書いてください。"></textarea></div>
         <div class="fld"><label>リンク（任意）</label><input id="purl" placeholder="https://"></div>
@@ -420,8 +435,8 @@
 const sb = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_KEY);
 let ME=null, MEMBERS=[], POSTS=[], COMMENTS=[], LIKES=[], RESOURCES=[], EVENTS=[], RSVPS=[];
 let mFilter="すべて", bFilter="すべて", cFilter="すべて";
-const MEMBER_CATS=["すべて","宿泊","サービス","物販","飲食","コンサル","その他"];
-const BOARD_CATS=["すべて","リクエスト","相談","シェア","コラボ募集","お知らせ","雑談"];
+const MEMBER_CATS=["すべて","民泊","宿泊","サービス","物販","飲食","コンサル","その他"];
+const BOARD_CATS=["すべて","リクエスト","理想の宿","相談","シェア","コラボ募集","お知らせ","雑談"];
 const $=id=>document.getElementById(id);
 const esc=s=>(s==null?"":String(s)).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 function fmt(ts){const d=new Date(ts);const p=n=>String(n).padStart(2,"0");return (d.getMonth()+1)+"/"+d.getDate()+" "+p(d.getHours())+":"+p(d.getMinutes());}
@@ -516,6 +531,13 @@ function closeModal(){ $("modal").classList.remove("on"); }
 $("modal").onclick=e=>{ if(e.target.id==="modal")closeModal(); };
 
 function linkify(t){return esc(t).replace(/(https?:\/\/[^\s]+)/g,'<a href="$1" target="_blank">$1</a>');}
+function startIdealInn(){
+  switchTab("board");
+  bFilter="理想の宿"; renderBoard();
+  const sel=$("pcat"); if(sel) sel.value="理想の宿";
+  const t=$("ptitle"); if(t){ t.placeholder="例：縁側で朝ごはんが食べられる宿"; t.focus(); }
+  const c=document.querySelector(".composer"); if(c) c.scrollIntoView({behavior:"smooth",block:"center"});
+}
 function renderBoard(){
   chipRow($("bfilters"),BOARD_CATS,bFilter,c=>{bFilter=c;renderBoard();});
   const q=($("bsearch").value||"").trim();
@@ -624,7 +646,7 @@ async function saveResource(){
 }
 
 function openProfileEdit(){
-  const m=ME||{}; const cats=["","宿泊","サービス","物販","飲食","コンサル","その他"];
+  const m=ME||{}; const cats=["","民泊","宿泊","サービス","物販","飲食","コンサル","その他"];
   $("modalbox").innerHTML=`<button class="x" onclick="closeModal()">×</button><h3>自己紹介の編集</h3><div style="height:14px"></div>
     <div class="fld"><label>お名前</label><input id="pf_name" value="${esc(m.name||"")}"></div>
     <div class="fld"><label>カテゴリ</label><select id="pf_cat">${cats.map(c=>`<option ${m.category===c?"selected":""}>${c}</option>`).join("")}</select></div>
