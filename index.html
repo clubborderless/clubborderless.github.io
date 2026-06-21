@@ -257,6 +257,21 @@
   .shopmore>summary::before{content:"＋ ";}
   .shopmore[open]>summary::before{content:"− ";}
   .shopdone{background:var(--paper); border:1px solid var(--line2); border-radius:8px; padding:40px 30px; text-align:center; font-size:15.5px; color:var(--sub); line-height:2;}
+
+  /* ── スマホのヘッダー崩れ対策 ── */
+  @media(max-width:560px){
+    .top-in{padding:12px 14px; gap:10px;}
+    .brand{gap:8px; min-width:0; flex:1 1 auto;}
+    .brand-mark{height:32px; width:auto; flex:none;}
+    .brand-txt{min-width:0;}
+    .brand .mark{font-size:14px; letter-spacing:.06em; white-space:nowrap;}
+    .brand .by{display:none;}
+    .brand .byhvmc{display:none;}
+    .me{gap:8px; flex:none;}
+    .me .av{width:32px; height:32px; flex:none;}
+    .me .nm{white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:38vw; font-size:13.5px;}
+    .me .gho{flex:none; padding:6px 10px; font-size:11px; white-space:nowrap;}
+  }
 </style>
 </head>
 <body>
@@ -269,11 +284,11 @@
     <img class="login-logo" src="cb-logo.png" alt="CLUB BORDERLESS">
     <div class="tagline">〜 インバウンド・アウトバウンド 〜</div>
     <div class="by">by Holland Village Members Club ｜ 起業家ワークショップ</div>
-    <p class="lead">メンバー限定のコミュニティです。<br>登録メールアドレスにログイン用のリンクをお送りします。</p>
+    <p class="lead">メンバー限定のコミュニティです。<br>使用したいメールアドレスを入れていただくと、ログイン用のリンクをお送りします。</p>
     <input id="loginEmail" type="email" placeholder="メールアドレス" autocomplete="email">
     <button class="btn" id="loginBtn" onclick="sendLink()">ログインリンクを送る</button>
     <div class="msg" id="loginMsg"></div>
-    <div class="note">パスワードは不要です。届いたメールのリンクを押すとログインできます。</div>
+    <div class="note">パスワードや事前登録は不要です。メールが届くので、本文の「Sign in」を押すとログインできます。</div>
   </div>
 </div>
 
