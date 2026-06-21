@@ -460,7 +460,7 @@ async function sendLink(){
 async function logout(){ await sb.auth.signOut(); location.reload(); }
 
 /* ---------- data ---------- */
-async function loadMembers(){ const { data }=await sb.from("profiles").select("*").order("is_seed").order("created_at"); MEMBERS=data||[]; renderMembers(); }
+async function loadMembers(){ const { data }=await sb.from("profiles").select("*").eq("is_seed",false).order("created_at"); MEMBERS=data||[]; renderMembers(); }
 async function loadBoard(){
   const a=await sb.from("posts").select("*, author:profiles!posts_author_id_fkey(name,photo_url)").order("created_at",{ascending:false});
   const b=await sb.from("comments").select("*, author:profiles!comments_author_id_fkey(name)").order("created_at");
