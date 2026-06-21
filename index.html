@@ -869,10 +869,7 @@ async function submitShop(){
   $("shopdone").style.display="block";
   $("shopdone").innerHTML="ありがとうございます。<br>内容を確認のうえ、DEEP JAPANへの掲載について<br>担当からご連絡します。";
 }
-function prefillShop(){ if(!ME)return;
-  if($("sh_name")&&!$("sh_name").value)$("sh_name").value=ME.name||"";
-  if($("sh_brand")&&!$("sh_brand").value)$("sh_brand").value=ME.role||"";
-  if($("sh_role")&&!$("sh_role").value)$("sh_role").value=[ME.role,ME.location].filter(Boolean).join(" ／ ");
+function prefillShop(){ /* 初期値の自動入力はしない（フォームは空のまま・各自で入力してもらう） */
 }
 
 /* ---------- tabs ---------- */
