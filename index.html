@@ -351,6 +351,7 @@
     <div class="center"><span class="syncnote">🌏 国別の訪日メディア・情報源</span></div>
     <div class="filters" id="cfilters"></div>
     <div class="mediawrap" id="mediawrap"></div>
+    <div class="addbar"><button class="addbtn" onclick="openResourceCreate()">＋ お役立ち情報を追加する</button></div>
   </div></section>
 
   <section class="page" id="events"><div class="wrap">
@@ -596,6 +597,26 @@ async function saveEvent(){
   const { error }=await sb.from("events").insert({ created_by:ME.id, title:t, event_date:$("ev_d").value||null, time_label:$("ev_time").value.trim()||null, place:$("ev_place").value.trim()||null, description:$("ev_desc").value.trim()||null });
   if(error){alert("作成に失敗しました："+error.message);return;}
   closeModal(); await loadEvents(); switchTab("events");
+}
+
+function openResourceCreate(){
+  const countries=Array.from(new Set(RESOURCES.map(r=>r.country))).filter(Boolean);
+  $("modalbox").innerHTML=`<button class="x" onclick="closeModal()">×</button><h3>お役立ち情報を追加</h3>
+    <p style="font-size:13px;color:var(--muted);line-height:1.8;margin:6px 0 16px;">訪日ゲストに届くメディアや、集客に役立つ情報源を共有できます。</p>
+    <div class="fld"><label>国・エリア</label><input id="rs_country" list="rs_countrylist" placeholder="例：🇹🇼 台湾／🌏 グローバル"><datalist id="rs_countrylist">${countries.map(c=>`<option value="${esc(c)}">`).join("")}</datalist></div>
+    <div class="fld"><label>メディア・情報名</label><input id="rs_name" placeholder="例：japan-guide.com"></div>
+    <div class="fld"><label>ひとことメモ（任意）</label><textarea id="rs_memo" placeholder="どんな相手に効くか・使い方など"></textarea></div>
+    <div class="fld"><label>URL（任意）</label><input id="rs_url" placeholder="https://"></div>
+    <button class="btn" onclick="saveResource()">追加する</button>`;
+  $("modal").classList.add("on");
+}
+async function saveResource(){
+  const country=$("rs_country").value.trim(), name=$("rs_name").value.trim();
+  if(!country){alert("国・エリアを入力してください。");return;}
+  if(!name){alert("メディア・情報名を入力してください。");return;}
+  const { error }=await sb.from("resources").insert({ country, name, memo:$("rs_memo").value.trim()||null, url:$("rs_url").value.trim()||null });
+  if(error){alert("追加に失敗しました："+error.message);return;}
+  closeModal(); await loadResources(); switchTab("useful");
 }
 
 function openProfileEdit(){
