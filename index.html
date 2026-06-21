@@ -269,6 +269,18 @@
   .innproject .ip-btn{background:var(--bronze); color:#f7f1e7; border:none; font-size:14px; letter-spacing:.06em; padding:12px 24px; border-radius:30px; cursor:pointer;}
   .innproject .ip-btn:hover{background:var(--gold);}
 
+  /* ── コラム ── */
+  .colcomposer{position:static!important; top:auto!important; max-width:760px; margin:0 auto 26px;}
+  .colfeed{display:flex; flex-direction:column; gap:26px; max-width:760px; margin:0 auto;}
+  .colart{background:var(--paper); border:1px solid var(--line2); border-radius:8px; overflow:hidden;}
+  .colart .col-img{width:100%; height:230px; background-size:cover; background-position:center;}
+  .colart .col-in{padding:24px 26px 22px;}
+  .colart .col-meta{display:flex; align-items:center; gap:9px; font-size:12.5px; color:var(--muted); margin-bottom:9px;}
+  .colart .col-meta .avs{width:26px; height:26px;}
+  .colart .col-meta .nm{color:var(--sub);}
+  .colart h3{font-family:"Shippori Mincho",serif; font-weight:500; font-size:21px; margin-bottom:11px; line-height:1.55;}
+  .colart .col-body{font-size:15px; color:var(--sub); line-height:1.95; white-space:pre-wrap;}
+
   /* ── スマホのヘッダー崩れ対策 ── */
   @media(max-width:560px){
     .top-in{padding:12px 14px; gap:10px;}
@@ -329,6 +341,7 @@
     <button class="tab on" data-tab="members">メンバー<span class="en">MEMBERS</span></button>
     <button class="tab" data-tab="board">掲示板<span class="en">BOARD</span></button>
     <button class="tab" data-tab="useful">お役立ち<span class="en">RESOURCES</span></button>
+    <button class="tab" data-tab="column">コラム<span class="en">COLUMN</span></button>
     <button class="tab" data-tab="events">イベント<span class="en">EVENTS</span></button>
     <button class="tab" data-tab="shop">DEEP JAPAN<span class="en">SHOP</span></button>
   </div></nav>
@@ -370,6 +383,19 @@
     <div class="filters" id="cfilters"></div>
     <div class="mediawrap" id="mediawrap"></div>
     <div class="addbar"><button class="addbtn" onclick="openResourceCreate()">＋ お役立ち情報を追加する</button></div>
+  </div></section>
+
+  <section class="page" id="column"><div class="wrap">
+    <div class="lede"><span class="cap">Column</span><h2 class="serif">コラム</h2><p>民泊・インバウンドのお役立ち情報をお届けします。気になったらコメントで気軽にどうぞ。</p></div>
+    <div class="composer colcomposer" id="colcomposer" style="display:none">
+      <h3 class="serif">コラムを書く</h3>
+      <div class="fld"><label>タイトル</label><input id="col_title" placeholder="例：ゲストに喜ばれる小さな工夫"></div>
+      <div class="fld"><label>本文</label><textarea id="col_body" rows="7" placeholder="民泊・インバウンドで役立つ話を書いてください。"></textarea></div>
+      <div class="fld"><label>写真（任意）</label><input id="col_img" type="file" accept="image/*"></div>
+      <div class="fld"><label>リンク（任意）</label><input id="col_url" placeholder="https://"></div>
+      <button class="btn" id="colBtn" onclick="addColumn()">公開する</button>
+    </div>
+    <div class="colfeed" id="colfeed"></div>
   </div></section>
 
   <section class="page" id="events"><div class="wrap">
@@ -485,7 +511,7 @@ async function loadBoard(){
   const a=await sb.from("posts").select("*, author:profiles!posts_author_id_fkey(name,photo_url)").order("created_at",{ascending:false});
   const b=await sb.from("comments").select("*, author:profiles!comments_author_id_fkey(name)").order("created_at");
   const c=await sb.from("post_likes").select("post_id,user_id");
-  POSTS=a.data||[]; COMMENTS=b.data||[]; LIKES=c.data||[]; renderBoard();
+  POSTS=a.data||[]; COMMENTS=b.data||[]; LIKES=c.data||[]; renderBoard(); renderColumns();
 }
 async function loadResources(){ const { data }=await sb.from("resources").select("*").order("country"); RESOURCES=data||[]; renderMedia(); }
 async function loadEvents(){
@@ -541,7 +567,7 @@ function startIdealInn(){
 function renderBoard(){
   chipRow($("bfilters"),BOARD_CATS,bFilter,c=>{bFilter=c;renderBoard();});
   const q=($("bsearch").value||"").trim();
-  const list=POSTS.filter(p=>(bFilter==="すべて"||p.category===bFilter)&&(!q||((p.title||"")+(p.body||"")+((p.author&&p.author.name)||"")).includes(q)));
+  const list=POSTS.filter(p=>p.category!=="コラム"&&(bFilter==="すべて"||p.category===bFilter)&&(!q||((p.title||"")+(p.body||"")+((p.author&&p.author.name)||"")).includes(q)));
   const f=$("feed");
   if(!list.length){f.innerHTML='<div class="empty">投稿がありません。最初の投稿をしてみましょう。</div>';return;}
   f.innerHTML=list.map(p=>{
@@ -557,6 +583,45 @@ function renderBoard(){
       <div class="creply"><input id="ci_${p.id}" placeholder="コメントを書く"><button onclick="addComment('${p.id}')">送信</button></div>
     </div>`;
   }).join("");
+}
+const COL_ADMIN="manami0702@gmail.com";
+function applyAdmin(){ const el=$("colcomposer"); if(el) el.style.display=(sbUser&&sbUser.email===COL_ADMIN)?"":"none"; }
+function renderColumns(){
+  applyAdmin();
+  const list=POSTS.filter(p=>p.category==="コラム");
+  const f=$("colfeed"); if(!f) return;
+  if(!list.length){ f.innerHTML='<div class="empty">まだコラムがありません。'+((sbUser&&sbUser.email===COL_ADMIN)?'上の入力欄から最初のコラムを書いてみましょう。':'お楽しみに。')+'</div>'; return; }
+  f.innerHTML=list.map(p=>{
+    const an=(p.author&&p.author.name)||"GRACES", ap=p.author&&p.author.photo_url;
+    const cm=COMMENTS.filter(c=>c.post_id===p.id);
+    const likes=LIKES.filter(l=>l.post_id===p.id); const liked=likes.some(l=>l.user_id===currentUid());
+    return `<article class="colart">
+      ${p.image_url?`<div class="col-img" style="background-image:url('${esc(p.image_url)}')"></div>`:""}
+      <div class="col-in">
+        <div class="col-meta"><span class="avs" ${avStyle(ap)}>${ap?"":esc(ini(an))}</span><span class="nm">${esc(an)}</span><span class="when">${fmt(p.created_at)}</span></div>
+        <h3 class="serif">${esc(p.title)}</h3>
+        <div class="col-body">${linkify(p.body||"")}${p.url?`<br><a href="${esc(p.url)}" target="_blank">${esc(p.url)}</a>`:""}</div>
+        <div class="act"><button class="${liked?'liked':''}" onclick="toggleLike('${p.id}')">${liked?'♥':'♡'} ${likes.length}</button><button>💬 ${cm.length}</button></div>
+        <div class="cmts">${cm.map(c=>`<div class="cmt"><div class="ch"><span class="nm">${esc((c.author&&c.author.name)||'メンバー')}</span><span class="wh">${fmt(c.created_at)}</span></div><div class="tx">${esc(c.body)}</div></div>`).join("")}</div>
+        <div class="creply"><input id="ci_${p.id}" placeholder="コメントを書く"><button onclick="addComment('${p.id}')">送信</button></div>
+      </div>
+    </article>`;
+  }).join("");
+}
+async function addColumn(){
+  const t=$("col_title").value.trim(), b=$("col_body").value.trim();
+  if(!t&&!b){ alert("タイトルか本文を入力してください。"); return; }
+  $("colBtn").disabled=true; $("colBtn").textContent="公開中…";
+  let image_url=null; const file=$("col_img").files[0];
+  if(file){
+    const path=(currentUid()||"col")+"/"+Date.now()+"_"+file.name.replace(/[^\w.\-]/g,"");
+    const up=await sb.storage.from("submissions").upload(path,file,{upsert:true});
+    if(!up.error){ image_url=sb.storage.from("submissions").getPublicUrl(path).data.publicUrl; }
+  }
+  const { error }=await sb.from("posts").insert({ author_id:ME.id, category:"コラム", title:t||"(無題)", body:b, url:$("col_url").value.trim()||null, image_url });
+  $("colBtn").disabled=false; $("colBtn").textContent="公開する";
+  if(error){ alert("公開に失敗しました："+error.message); return; }
+  $("col_title").value="";$("col_body").value="";$("col_url").value="";$("col_img").value=""; await loadBoard(); switchTab("column");
 }
 function currentUid(){ return sbUser?sbUser.id:null; }
 let sbUser=null;
@@ -725,8 +790,8 @@ function switchTab(name){
 document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>switchTab(t.dataset.tab));
 
 /* keep sbUser in sync */
-sb.auth.getUser().then(({data})=>{ sbUser=data&&data.user; });
-sb.auth.onAuthStateChange((_e,s)=>{ sbUser=s?s.user:null; });
+sb.auth.getUser().then(({data})=>{ sbUser=data&&data.user; applyAdmin(); });
+sb.auth.onAuthStateChange((_e,s)=>{ sbUser=s?s.user:null; applyAdmin(); });
 
 boot();
 </script>
