@@ -282,6 +282,22 @@
   .colart .col-body{font-size:15px; color:var(--sub); line-height:1.95; white-space:pre-wrap;}
   .nb{white-space:nowrap;}
 
+  /* ── メンバーの宿（民泊タブ下部） ── */
+  .innzone{margin:38px auto 0; padding-top:30px; border-top:1px solid var(--line2); max-width:760px;}
+  .innhead h3{font-family:"Shippori Mincho",serif; font-weight:500; font-size:21px; margin-bottom:7px;}
+  .innhead p{font-size:14px; color:var(--sub); line-height:1.9;}
+  .inngrid{display:grid; grid-template-columns:repeat(2,1fr); gap:18px;}
+  @media(max-width:560px){.inngrid{grid-template-columns:1fr;}}
+  .inncard{background:var(--paper); border:1px solid var(--line2); border-radius:8px; overflow:hidden; display:flex; flex-direction:column;}
+  .inncard .inn-img{width:100%; height:160px; background-size:cover; background-position:center;}
+  .inncard .inn-in{padding:18px 20px 16px; display:flex; flex-direction:column; gap:6px; flex:1;}
+  .inncard .inn-nm{font-family:"Shippori Mincho",serif; font-weight:500; font-size:17px;}
+  .inncard .inn-meta{font-size:12.5px; color:var(--bronze);}
+  .inncard .inn-bio{font-size:13.5px; color:var(--sub); line-height:1.8; flex:1;}
+  .inncard .inn-go{font-size:13px; color:var(--bronze); border:1px solid var(--bronze2); border-radius:30px; padding:8px 16px; text-align:center; text-decoration:none; margin-top:4px;}
+  .inncard .inn-go:hover{background:var(--bronze); color:#f7f1e7;}
+  .inncard .inn-by{font-size:11.5px; color:var(--muted);}
+
   /* ── スマホのヘッダー崩れ対策 ── */
   @media(max-width:560px){
     .top-in{padding:11px 13px; gap:8px; flex-wrap:nowrap;}
@@ -389,6 +405,11 @@
       <button class="btn" id="colBtn" onclick="addColumn()">公開する</button>
     </div>
     <div class="colfeed" id="colfeed"></div>
+    <div class="innzone">
+      <div class="innhead"><h3 class="serif">メンバーの宿</h3><p>ホテルや民泊を運営している方は、ぜひあなたの宿を紹介してください。</p></div>
+      <div class="addbar" style="margin:6px 0 22px"><button class="addbtn" onclick="openInnCreate()">＋ 宿を紹介する</button></div>
+      <div class="inngrid" id="innfeed"></div>
+    </div>
   </div></section>
 
   <section class="page" id="idealinn"><div class="wrap">
@@ -516,7 +537,7 @@ async function loadBoard(){
   const a=await sb.from("posts").select("*, author:profiles!posts_author_id_fkey(name,photo_url)").order("created_at",{ascending:false});
   const b=await sb.from("comments").select("*, author:profiles!comments_author_id_fkey(name)").order("created_at");
   const c=await sb.from("post_likes").select("post_id,user_id");
-  POSTS=a.data||[]; COMMENTS=b.data||[]; LIKES=c.data||[]; renderBoard(); renderColumns(); renderIdeal();
+  POSTS=a.data||[]; COMMENTS=b.data||[]; LIKES=c.data||[]; renderBoard(); renderColumns(); renderIdeal(); renderInns();
 }
 async function loadResources(){ const { data }=await sb.from("resources").select("*").order("country"); RESOURCES=data||[]; renderMedia(); }
 async function loadEvents(){
@@ -590,10 +611,57 @@ async function addIdeal(){
   if(error){ alert("投稿に失敗しました："+error.message); return; }
   $("ii_title").value="";$("ii_body").value="";$("ii_url").value=""; await loadBoard(); switchTab("idealinn");
 }
+function renderInns(){
+  const list=POSTS.filter(p=>p.category==="宿紹介");
+  const f=$("innfeed"); if(!f) return;
+  if(!list.length){ f.innerHTML='<div class="empty">まだ宿の紹介がありません。運営している方は「＋ 宿を紹介する」からどうぞ。</div>'; return; }
+  f.innerHTML=list.map(p=>{
+    const by=(p.author&&p.author.name)||"メンバー";
+    const meta=[p.area,p.capacity].filter(Boolean).join("　・　");
+    const u=p.url?(/^https?:/.test(p.url)?p.url:'https://'+p.url):"";
+    return `<div class="inncard">
+      ${p.image_url?`<div class="inn-img" style="background-image:url('${esc(p.image_url)}')"></div>`:""}
+      <div class="inn-in">
+        <div class="inn-nm">${esc(p.title)}</div>
+        ${meta?`<div class="inn-meta">${esc(meta)}</div>`:""}
+        <div class="inn-bio">${esc(p.body||"")}</div>
+        ${u?`<a class="inn-go" href="${esc(u)}" target="_blank">宿を見る →</a>`:""}
+        <div class="inn-by">紹介：${esc(by)}</div>
+      </div>
+    </div>`;
+  }).join("");
+}
+function openInnCreate(){
+  $("modalbox").innerHTML=`<button class="x" onclick="closeModal()">×</button><h3>宿を紹介する</h3>
+    <p style="font-size:13px;color:var(--muted);line-height:1.8;margin:6px 0 16px;">ホテル・民泊を運営している方向け。あなたの宿をメンバーに紹介できます。</p>
+    <div class="fld"><label>宿名</label><input id="in_name" placeholder="例：ヤマグチハウス ヴィラ大平荘"></div>
+    <div class="fld"><label>エリア</label><input id="in_area" placeholder="例：長野県岡谷市"></div>
+    <div class="fld"><label>収容人数</label><input id="in_cap" placeholder="例：4〜6名"></div>
+    <div class="fld"><label>ひとこと紹介</label><textarea id="in_bio" placeholder="宿の魅力・特徴・どんな方におすすめか"></textarea></div>
+    <div class="fld"><label>写真（任意）</label><input id="in_img" type="file" accept="image/*"></div>
+    <div class="fld"><label>予約サイト・HPのURL（任意）</label><input id="in_url" placeholder="https://"></div>
+    <button class="btn" id="inBtn" onclick="saveInn()">紹介を載せる</button>`;
+  $("modal").classList.add("on");
+}
+async function saveInn(){
+  const name=$("in_name").value.trim();
+  if(!name){ alert("宿名を入力してください。"); return; }
+  $("inBtn").disabled=true; $("inBtn").textContent="送信中…";
+  let image_url=null; const file=$("in_img").files[0];
+  if(file){
+    const path=(currentUid()||"inn")+"/"+Date.now()+"_"+file.name.replace(/[^\w.\-]/g,"");
+    const up=await sb.storage.from("submissions").upload(path,file,{upsert:true});
+    if(!up.error){ image_url=sb.storage.from("submissions").getPublicUrl(path).data.publicUrl; }
+  }
+  const { error }=await sb.from("posts").insert({ author_id:ME.id, category:"宿紹介", title:name, body:$("in_bio").value.trim()||null, url:$("in_url").value.trim()||null, image_url, area:$("in_area").value.trim()||null, capacity:$("in_cap").value.trim()||null });
+  $("inBtn").disabled=false; $("inBtn").textContent="紹介を載せる";
+  if(error){ alert("送信に失敗しました："+error.message); return; }
+  closeModal(); await loadBoard(); switchTab("column");
+}
 function renderBoard(){
   chipRow($("bfilters"),BOARD_CATS,bFilter,c=>{bFilter=c;renderBoard();});
   const q=($("bsearch").value||"").trim();
-  const list=POSTS.filter(p=>p.category!=="コラム"&&p.category!=="理想の宿"&&(bFilter==="すべて"||p.category===bFilter)&&(!q||((p.title||"")+(p.body||"")+((p.author&&p.author.name)||"")).includes(q)));
+  const list=POSTS.filter(p=>p.category!=="コラム"&&p.category!=="理想の宿"&&p.category!=="宿紹介"&&(bFilter==="すべて"||p.category===bFilter)&&(!q||((p.title||"")+(p.body||"")+((p.author&&p.author.name)||"")).includes(q)));
   const f=$("feed");
   if(!list.length){f.innerHTML='<div class="empty">投稿がありません。最初の投稿をしてみましょう。</div>';return;}
   f.innerHTML=list.map(p=>{
