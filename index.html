@@ -340,6 +340,7 @@
     <button class="tab" data-tab="board">掲示板<span class="en">BOARD</span></button>
     <button class="tab" data-tab="useful">お役立ち<span class="en">RESOURCES</span></button>
     <button class="tab" data-tab="column">民泊<span class="en">MINPAKU</span></button>
+    <button class="tab" data-tab="idealinn">理想の宿<span class="en">IDEAL INN</span></button>
     <button class="tab" data-tab="events">イベント<span class="en">EVENTS</span></button>
     <button class="tab" data-tab="shop">DEEP JAPAN<span class="en">SHOP</span></button>
   </div></nav>
@@ -354,18 +355,12 @@
 
   <section class="page" id="board"><div class="wrap">
     <div class="lede"><span class="cap">Board</span><h2 class="serif">掲示板</h2><p>相談・シェア・コラボ募集・リクエスト。カテゴリを選んで投稿、コメントで会話できます。</p></div>
-    <div class="innproject">
-      <div class="ip-cap">PROJECT</div>
-      <h3 class="serif">みんなで“理想の宿”を作っちゃおうプロジェクト</h3>
-      <p>「こんな宿があったら泊まりたい！」を自由に書ける場所です。設備でも、過ごし方でも、サービスでも、思いつきでもOK。集まったアイデアを、いつか本当に形にするのが目標です。</p>
-      <button class="ip-btn" onclick="startIdealInn()">理想の宿のアイデアを書く</button>
-    </div>
     <div class="filters" id="bfilters"></div>
     <div class="search"><input id="bsearch" placeholder="投稿を検索" oninput="renderBoard()"></div>
     <div class="board">
       <div class="composer">
         <h3 class="serif">投稿する</h3>
-        <div class="fld"><label>カテゴリ</label><select id="pcat"><option>リクエスト</option><option>理想の宿</option><option>相談</option><option>シェア</option><option>コラボ募集</option><option>お知らせ</option><option>雑談</option></select></div>
+        <div class="fld"><label>カテゴリ</label><select id="pcat"><option>リクエスト</option><option>相談</option><option>シェア</option><option>コラボ募集</option><option>お知らせ</option><option>雑談</option></select></div>
         <div class="fld"><label>タイトル</label><input id="ptitle" placeholder="例：海外発送のコツを知りたい"></div>
         <div class="fld"><label>内容</label><textarea id="pbody" placeholder="相談・シェア・募集したいことを書いてください。"></textarea></div>
         <div class="fld"><label>リンク（任意）</label><input id="purl" placeholder="https://"></div>
@@ -394,6 +389,18 @@
       <button class="btn" id="colBtn" onclick="addColumn()">公開する</button>
     </div>
     <div class="colfeed" id="colfeed"></div>
+  </div></section>
+
+  <section class="page" id="idealinn"><div class="wrap">
+    <div class="lede"><span class="cap">Ideal Inn</span><h2 class="serif">理想の宿</h2><p>「こんな宿があったら泊まりたい！」を自由に書ける場所です。設備でも、過ごし方でも、サービスでも、思いつきでもOK。集まったアイデアを、いつか本当に形にするのが目標です。</p></div>
+    <div class="composer colcomposer">
+      <h3 class="serif">理想の宿のアイデアを書く</h3>
+      <div class="fld"><label>タイトル</label><input id="ii_title" placeholder="例：縁側で朝ごはんが食べられる宿"></div>
+      <div class="fld"><label>内容</label><textarea id="ii_body" rows="5" placeholder="設備・過ごし方・サービス・思いつき、なんでもOKです。"></textarea></div>
+      <div class="fld"><label>リンク（任意）</label><input id="ii_url" placeholder="https://"></div>
+      <button class="btn" id="iiBtn" onclick="addIdeal()">投稿する</button>
+    </div>
+    <div class="colfeed" id="iifeed"></div>
   </div></section>
 
   <section class="page" id="events"><div class="wrap">
@@ -460,7 +467,7 @@ const sb = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_KEY
 let ME=null, MEMBERS=[], POSTS=[], COMMENTS=[], LIKES=[], RESOURCES=[], EVENTS=[], RSVPS=[];
 let mFilter="すべて", bFilter="すべて", cFilter="すべて";
 const MEMBER_CATS=["すべて","民泊","宿泊","サービス","物販","飲食","コンサル","その他"];
-const BOARD_CATS=["すべて","リクエスト","理想の宿","相談","シェア","コラボ募集","お知らせ","雑談"];
+const BOARD_CATS=["すべて","リクエスト","相談","シェア","コラボ募集","お知らせ","雑談"];
 const $=id=>document.getElementById(id);
 const esc=s=>(s==null?"":String(s)).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 function fmt(ts){const d=new Date(ts);const p=n=>String(n).padStart(2,"0");return (d.getMonth()+1)+"/"+d.getDate()+" "+p(d.getHours())+":"+p(d.getMinutes());}
@@ -509,7 +516,7 @@ async function loadBoard(){
   const a=await sb.from("posts").select("*, author:profiles!posts_author_id_fkey(name,photo_url)").order("created_at",{ascending:false});
   const b=await sb.from("comments").select("*, author:profiles!comments_author_id_fkey(name)").order("created_at");
   const c=await sb.from("post_likes").select("post_id,user_id");
-  POSTS=a.data||[]; COMMENTS=b.data||[]; LIKES=c.data||[]; renderBoard(); renderColumns();
+  POSTS=a.data||[]; COMMENTS=b.data||[]; LIKES=c.data||[]; renderBoard(); renderColumns(); renderIdeal();
 }
 async function loadResources(){ const { data }=await sb.from("resources").select("*").order("country"); RESOURCES=data||[]; renderMedia(); }
 async function loadEvents(){
@@ -555,17 +562,38 @@ function closeModal(){ $("modal").classList.remove("on"); }
 $("modal").onclick=e=>{ if(e.target.id==="modal")closeModal(); };
 
 function linkify(t){return esc(t).replace(/(https?:\/\/[^\s]+)/g,'<a href="$1" target="_blank">$1</a>');}
-function startIdealInn(){
-  switchTab("board");
-  bFilter="理想の宿"; renderBoard();
-  const sel=$("pcat"); if(sel) sel.value="理想の宿";
-  const t=$("ptitle"); if(t){ t.placeholder="例：縁側で朝ごはんが食べられる宿"; t.focus(); }
-  const c=document.querySelector(".composer"); if(c) c.scrollIntoView({behavior:"smooth",block:"center"});
+function postCardHtml(p){
+  const an=(p.author&&p.author.name)||"メンバー", ap=p.author&&p.author.photo_url;
+  const cm=COMMENTS.filter(c=>c.post_id===p.id);
+  const likes=LIKES.filter(l=>l.post_id===p.id); const liked=likes.some(l=>l.user_id===currentUid());
+  return `<div class="post">
+    <div class="ph"><div class="who"><span class="avs" ${avStyle(ap)}>${ap?"":esc(ini(an))}</span><span class="nm">${esc(an)}</span><span class="pcat b-${p.category}">${p.category}</span></div><span class="when">${fmt(p.created_at)}</span></div>
+    <h4>${esc(p.title)}</h4>
+    <div class="body">${linkify(p.body||"")}${p.url?`<br><a href="${esc(p.url)}" target="_blank">${esc(p.url)}</a>`:""}</div>
+    <div class="act"><button class="${liked?'liked':''}" onclick="toggleLike('${p.id}')">${liked?'♥':'♡'} ${likes.length}</button><button>💬 ${cm.length}</button></div>
+    <div class="cmts">${cm.map(c=>`<div class="cmt"><div class="ch"><span class="nm">${esc((c.author&&c.author.name)||'メンバー')}</span><span class="wh">${fmt(c.created_at)}</span></div><div class="tx">${esc(c.body)}</div></div>`).join("")}</div>
+    <div class="creply"><input id="ci_${p.id}" placeholder="コメントを書く"><button onclick="addComment('${p.id}')">送信</button></div>
+  </div>`;
+}
+function renderIdeal(){
+  const list=POSTS.filter(p=>p.category==="理想の宿");
+  const f=$("iifeed"); if(!f) return;
+  if(!list.length){ f.innerHTML='<div class="empty">まだアイデアがありません。最初の「こんな宿があったらいいな」を書いてみましょう。</div>'; return; }
+  f.innerHTML=list.map(postCardHtml).join("");
+}
+async function addIdeal(){
+  const t=$("ii_title").value.trim(), b=$("ii_body").value.trim();
+  if(!t&&!b){ alert("タイトルか内容を入力してください。"); return; }
+  $("iiBtn").disabled=true;
+  const { error }=await sb.from("posts").insert({ author_id:ME.id, category:"理想の宿", title:t||"(無題)", body:b, url:$("ii_url").value.trim()||null });
+  $("iiBtn").disabled=false;
+  if(error){ alert("投稿に失敗しました："+error.message); return; }
+  $("ii_title").value="";$("ii_body").value="";$("ii_url").value=""; await loadBoard(); switchTab("idealinn");
 }
 function renderBoard(){
   chipRow($("bfilters"),BOARD_CATS,bFilter,c=>{bFilter=c;renderBoard();});
   const q=($("bsearch").value||"").trim();
-  const list=POSTS.filter(p=>p.category!=="コラム"&&(bFilter==="すべて"||p.category===bFilter)&&(!q||((p.title||"")+(p.body||"")+((p.author&&p.author.name)||"")).includes(q)));
+  const list=POSTS.filter(p=>p.category!=="コラム"&&p.category!=="理想の宿"&&(bFilter==="すべて"||p.category===bFilter)&&(!q||((p.title||"")+(p.body||"")+((p.author&&p.author.name)||"")).includes(q)));
   const f=$("feed");
   if(!list.length){f.innerHTML='<div class="empty">投稿がありません。最初の投稿をしてみましょう。</div>';return;}
   f.innerHTML=list.map(p=>{
