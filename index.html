@@ -280,6 +280,7 @@
   .colart .col-meta .nm{color:var(--sub);}
   .colart h3{font-family:"Shippori Mincho",serif; font-weight:500; font-size:21px; margin-bottom:11px; line-height:1.55;}
   .colart .col-body{font-size:15px; color:var(--sub); line-height:1.95; white-space:pre-wrap;}
+  .nb{white-space:nowrap;}
 
   /* ── スマホのヘッダー崩れ対策 ── */
   @media(max-width:560px){
@@ -303,7 +304,7 @@
   <div class="card">
     <img class="login-logo" src="cb-logo.png" alt="CLUB BORDERLESS">
     <div class="tagline">〜 インバウンド・アウトバウンド 〜</div>
-    <div class="by">by Holland Village Members Club ｜ 起業家ワークショップ</div>
+    <div class="by">by Holland Village Members Club ｜ <span class="nb">起業家ワークショップ</span></div>
     <p class="lead">メンバー限定のコミュニティです。<br>使用したいメールアドレスを入れていただくと、ログイン用のリンクをお送りします。</p>
     <input id="loginEmail" type="email" placeholder="メールアドレス" autocomplete="email">
     <button class="btn" id="loginBtn" onclick="sendLink()">ログインリンクを送る</button>
@@ -322,7 +323,7 @@
         <div class="brand-txt">
           <span class="mark serif">CLUB BORDERLESS</span>
           <span class="by">〜 インバウンド・アウトバウンド 〜</span>
-          <span class="byhvmc">by Holland Village Members Club ｜ 起業家ワークショップ</span>
+          <span class="byhvmc">by Holland Village Members Club ｜ <span class="nb">起業家ワークショップ</span></span>
         </div>
       </div>
       <div class="me">
@@ -338,7 +339,7 @@
     <button class="tab on" data-tab="members">メンバー<span class="en">MEMBERS</span></button>
     <button class="tab" data-tab="board">掲示板<span class="en">BOARD</span></button>
     <button class="tab" data-tab="useful">お役立ち<span class="en">RESOURCES</span></button>
-    <button class="tab" data-tab="column">コラム<span class="en">COLUMN</span></button>
+    <button class="tab" data-tab="column">民泊<span class="en">MINPAKU</span></button>
     <button class="tab" data-tab="events">イベント<span class="en">EVENTS</span></button>
     <button class="tab" data-tab="shop">DEEP JAPAN<span class="en">SHOP</span></button>
   </div></nav>
@@ -375,7 +376,7 @@
   </div></section>
 
   <section class="page" id="useful"><div class="wrap">
-    <div class="lede"><span class="cap">Resources</span><h2 class="serif">お役立ち情報</h2><p>訪日ゲストに届く、国別のメディア・情報源リスト。集客に役立ててください。</p></div>
+    <div class="lede"><span class="cap">Resources</span><h2 class="serif">お役立ち情報</h2><p>訪日ゲストに届く、国別のメディア・情報源リスト。集客に役立ててください。知っている情報があれば、ぜひ積極的に書き込んでください。一番下の「＋ お役立ち情報を追加する」から追加できます。</p></div>
     <div class="center"><span class="syncnote">🌏 国別の訪日メディア・情報源</span></div>
     <div class="filters" id="cfilters"></div>
     <div class="mediawrap" id="mediawrap"></div>
@@ -383,9 +384,9 @@
   </div></section>
 
   <section class="page" id="column"><div class="wrap">
-    <div class="lede"><span class="cap">Column</span><h2 class="serif">コラム</h2><p>民泊・インバウンドのお役立ち情報をお届けします。気になったらコメントで気軽にどうぞ。</p></div>
+    <div class="lede"><span class="cap">Minpaku</span><h2 class="serif">民泊</h2><p>ここだけの、民泊運営に役立つ情報を発信します。気になったらコメントで気軽にどうぞ。</p></div>
     <div class="composer colcomposer" id="colcomposer" style="display:none">
-      <h3 class="serif">コラムを書く</h3>
+      <h3 class="serif">民泊の情報を書く</h3>
       <div class="fld"><label>タイトル</label><input id="col_title" placeholder="例：ゲストに喜ばれる小さな工夫"></div>
       <div class="fld"><label>本文</label><textarea id="col_body" rows="7" placeholder="民泊・インバウンドで役立つ話を書いてください。"></textarea></div>
       <div class="fld"><label>写真（任意）</label><input id="col_img" type="file" accept="image/*"></div>
@@ -445,7 +446,7 @@
   <div class="footnote">
     <div class="f-mark serif">CLUB BORDERLESS</div>
     <div class="f-tag">〜 インバウンド・アウトバウンド 〜</div>
-    <div class="f-by">by Holland Village Members Club ｜ 起業家ワークショップ</div>
+    <div class="f-by">by Holland Village Members Club ｜ <span class="nb">起業家ワークショップ</span></div>
     <div class="f-conf">このコミュニティでのやりとり・投稿・メンバーの情報は、外部への口外・転載・転用はご遠慮ください。</div>
   </div>
 </div>
@@ -587,7 +588,7 @@ function renderColumns(){
   applyAdmin();
   const list=POSTS.filter(p=>p.category==="コラム");
   const f=$("colfeed"); if(!f) return;
-  if(!list.length){ f.innerHTML='<div class="empty">まだコラムがありません。'+((sbUser&&sbUser.email===COL_ADMIN)?'上の入力欄から最初のコラムを書いてみましょう。':'お楽しみに。')+'</div>'; return; }
+  if(!list.length){ f.innerHTML='<div class="empty">まだ投稿がありません。'+((sbUser&&sbUser.email===COL_ADMIN)?'上の入力欄から発信してみましょう。':'お楽しみに。')+'</div>'; return; }
   f.innerHTML=list.map(p=>{
     const an=(p.author&&p.author.name)||"GRACES", ap=p.author&&p.author.photo_url;
     const cm=COMMENTS.filter(c=>c.post_id===p.id);
