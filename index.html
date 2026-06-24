@@ -114,6 +114,7 @@
   .b-理想の宿{background:#efe6d2; color:#8a6b2f;}
   .b-シェア{background:#f5ead9; color:#9a6c2e;} .b-コラボ募集{background:#e6f0e8; color:#3f6a4c;}
   .b-お知らせ{background:#f1e6f0; color:#7c4f78;} .b-雑談{background:#ececea; color:#6a6760;}
+  .ob-country{background:#e7eef4; color:#3f5a73;} .ob-theme{background:#efe6d2; color:#8a6b2f;}
   .post h4{font-family:"Shippori Mincho",serif; font-weight:500; font-size:17px; margin:5px 0 7px;}
   .post .body{font-size:13.5px; color:var(--sub); line-height:1.85; white-space:pre-wrap; word-break:break-word;}
   .post .body a{color:var(--bronze);}
@@ -363,6 +364,7 @@
     <button class="tab on" data-tab="members">メンバー<span class="en">MEMBERS</span></button>
     <button class="tab" data-tab="board">掲示板<span class="en">BOARD</span></button>
     <button class="tab" data-tab="useful">お役立ち<span class="en">RESOURCES</span></button>
+    <button class="tab" data-tab="outbound">アウトバウンド<span class="en">OUTBOUND</span></button>
     <button class="tab" data-tab="column">民泊<span class="en">MINPAKU</span></button>
     <button class="tab" data-tab="idealinn">理想の宿<span class="en">IDEAL INN</span></button>
     <button class="tab" data-tab="events">イベント<span class="en">EVENTS</span></button>
@@ -400,6 +402,27 @@
     <div class="filters" id="cfilters"></div>
     <div class="mediawrap" id="mediawrap"></div>
     <div class="addbar"><button class="addbtn" onclick="openResourceCreate()">＋ お役立ち情報を追加する</button></div>
+  </div></section>
+
+  <section class="page" id="outbound"><div class="wrap">
+    <div class="lede"><span class="cap">Outbound</span><h2 class="serif">アウトバウンド</h2><p>海外へ商品・サービスを届けるための情報を、国別・テーマ別に共有する場所です。規制・物流・現地の好み・販路・成功事例など、知っていることを書き込んでください。コメントで質問や補足もできます。</p></div>
+    <div class="board">
+      <div class="composer">
+        <h3 class="serif">情報を投稿する</h3>
+        <div class="fld"><label>国・エリア</label><input id="ob_country" list="ob_countrylist" placeholder="例：🇹🇼 台湾／🌏 グローバル"><datalist id="ob_countrylist"></datalist></div>
+        <div class="fld"><label>テーマ</label><select id="ob_theme"><option>食品・飲料</option><option>工芸・雑貨</option><option>美容・コスメ</option><option>ファッション</option><option>体験・サービス</option><option>コンサル</option><option>その他</option></select></div>
+        <div class="fld"><label>タイトル</label><input id="ob_title" placeholder="例：台湾向け食品輸出の表示ルール"></div>
+        <div class="fld"><label>内容</label><textarea id="ob_body" placeholder="規制・物流・現地の好み・販路・体験談など、役立つ情報を書いてください。"></textarea></div>
+        <div class="fld"><label>リンク（任意）</label><input id="ob_url" placeholder="https://"></div>
+        <button class="btn" id="obBtn" onclick="addOutbound()">投稿する</button>
+      </div>
+      <div>
+        <div class="filters" id="obcfilters"></div>
+        <div class="filters" id="obtfilters" style="margin-bottom:20px"></div>
+        <div class="search"><input id="obsearch" placeholder="投稿を検索" oninput="renderOutbound()"></div>
+        <div class="feed" id="obfeed"></div>
+      </div>
+    </div>
   </div></section>
 
   <section class="page" id="column"><div class="wrap">
@@ -497,6 +520,8 @@ let ME=null, MEMBERS=[], POSTS=[], COMMENTS=[], LIKES=[], RESOURCES=[], EVENTS=[
 let mFilter="すべて", bFilter="すべて", cFilter="すべて";
 const MEMBER_CATS=["すべて","宿泊","サービス","物販","飲食","コンサル","その他"];
 const BOARD_CATS=["すべて","リクエスト","相談","シェア","コラボ募集","お知らせ","雑談"];
+const OUTBOUND_THEMES=["すべて","食品・飲料","工芸・雑貨","美容・コスメ","ファッション","体験・サービス","コンサル","その他"];
+let obCountryFilter="すべて", obThemeFilter="すべて";
 const $=id=>document.getElementById(id);
 const esc=s=>(s==null?"":String(s)).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 function fmt(ts){const d=new Date(ts);const p=n=>String(n).padStart(2,"0");return (d.getMonth()+1)+"/"+d.getDate()+" "+p(d.getHours())+":"+p(d.getMinutes());}
@@ -545,7 +570,7 @@ async function loadBoard(){
   const a=await sb.from("posts").select("*, author:profiles!posts_author_id_fkey(name,photo_url)").order("created_at",{ascending:false});
   const b=await sb.from("comments").select("*, author:profiles!comments_author_id_fkey(name)").order("created_at");
   const c=await sb.from("post_likes").select("post_id,user_id");
-  POSTS=a.data||[]; COMMENTS=b.data||[]; LIKES=c.data||[]; renderBoard(); renderColumns(); renderIdeal(); renderInns();
+  POSTS=a.data||[]; COMMENTS=b.data||[]; LIKES=c.data||[]; renderBoard(); renderColumns(); renderIdeal(); renderInns(); renderOutbound();
 }
 async function loadResources(){ const { data }=await sb.from("resources").select("*").order("country"); RESOURCES=data||[]; renderMedia(); }
 async function loadEvents(){
@@ -669,7 +694,7 @@ async function saveInn(){
 function renderBoard(){
   chipRow($("bfilters"),BOARD_CATS,bFilter,c=>{bFilter=c;renderBoard();});
   const q=($("bsearch").value||"").trim();
-  const list=POSTS.filter(p=>p.category!=="コラム"&&p.category!=="理想の宿"&&p.category!=="宿紹介"&&(bFilter==="すべて"||p.category===bFilter)&&(!q||((p.title||"")+(p.body||"")+((p.author&&p.author.name)||"")).includes(q)));
+  const list=POSTS.filter(p=>p.category!=="コラム"&&p.category!=="理想の宿"&&p.category!=="宿紹介"&&p.category!=="アウトバウンド"&&(bFilter==="すべて"||p.category===bFilter)&&(!q||((p.title||"")+(p.body||"")+((p.author&&p.author.name)||"")).includes(q)));
   const f=$("feed");
   if(!list.length){f.innerHTML='<div class="empty">投稿がありません。最初の投稿をしてみましょう。</div>';return;}
   f.innerHTML=list.map(p=>{
@@ -748,6 +773,50 @@ async function toggleLike(pid){
   if(liked) await sb.from("post_likes").delete().eq("post_id",pid).eq("user_id",currentUid());
   else await sb.from("post_likes").insert({ post_id:pid, user_id:currentUid() });
   await loadBoard();
+}
+
+/* ---------- outbound ---------- */
+function obCardHtml(p){
+  const an=(p.author&&p.author.name)||"メンバー", ap=p.author&&p.author.photo_url;
+  const cm=COMMENTS.filter(c=>c.post_id===p.id);
+  const likes=LIKES.filter(l=>l.post_id===p.id); const liked=likes.some(l=>l.user_id===currentUid());
+  const tags=(p.country?`<span class="pcat ob-country">${esc(p.country)}</span>`:"")+(p.theme?`<span class="pcat ob-theme">${esc(p.theme)}</span>`:"");
+  return `<div class="post">
+    <div class="ph"><div class="who"><span class="avs" ${avStyle(ap)}>${ap?"":esc(ini(an))}</span><span class="nm">${esc(an)}</span>${tags}</div><span class="when">${fmt(p.created_at)}</span></div>
+    <h4>${esc(p.title)}</h4>
+    <div class="body">${linkify(p.body||"")}${p.url?`<br><a href="${esc(p.url)}" target="_blank">${esc(p.url)}</a>`:""}</div>
+    <div class="act"><button class="${liked?'liked':''}" onclick="toggleLike('${p.id}')">${liked?'♥':'♡'} ${likes.length}</button><button>💬 ${cm.length}</button></div>
+    <div class="cmts">${cm.map(c=>`<div class="cmt"><div class="ch"><span class="nm">${esc((c.author&&c.author.name)||'メンバー')}</span><span class="wh">${fmt(c.created_at)}</span></div><div class="tx">${esc(c.body)}</div></div>`).join("")}</div>
+    <div class="creply"><input id="ci_${p.id}" placeholder="コメントを書く"><button onclick="addComment('${p.id}')">送信</button></div>
+  </div>`;
+}
+function renderOutbound(){
+  const list0=POSTS.filter(p=>p.category==="アウトバウンド");
+  const dl=$("ob_countrylist");
+  if(dl){ const cs=Array.from(new Set([...RESOURCES.map(r=>r.country),...list0.map(p=>p.country)].filter(Boolean))); dl.innerHTML=cs.map(c=>`<option value="${esc(c)}">`).join(""); }
+  const countries=["すべて",...Array.from(new Set(list0.map(p=>p.country).filter(Boolean)))];
+  if(!countries.includes(obCountryFilter)) obCountryFilter="すべて";
+  chipRow($("obcfilters"),countries,obCountryFilter,c=>{obCountryFilter=c;renderOutbound();});
+  chipRow($("obtfilters"),OUTBOUND_THEMES,obThemeFilter,c=>{obThemeFilter=c;renderOutbound();});
+  const q=(($("obsearch")&&$("obsearch").value)||"").trim();
+  const list=list0.filter(p=>
+    (obCountryFilter==="すべて"||p.country===obCountryFilter)&&
+    (obThemeFilter==="すべて"||p.theme===obThemeFilter)&&
+    (!q||((p.title||"")+(p.body||"")+(p.country||"")+(p.theme||"")+((p.author&&p.author.name)||"")).includes(q))
+  );
+  const f=$("obfeed"); if(!f) return;
+  if(!list.length){ f.innerHTML='<div class="empty">まだ投稿がありません。最初の情報を共有してみましょう。</div>'; return; }
+  f.innerHTML=list.map(obCardHtml).join("");
+}
+async function addOutbound(){
+  const c=$("ob_country").value.trim(), t=$("ob_title").value.trim(), b=$("ob_body").value.trim();
+  if(!c){ alert("国・エリアを入力してください。"); return; }
+  if(!t&&!b){ alert("タイトルか内容を入力してください。"); return; }
+  $("obBtn").disabled=true;
+  const { error }=await sb.from("posts").insert({ author_id:ME.id, category:"アウトバウンド", country:c, theme:$("ob_theme").value, title:t||"(無題)", body:b, url:$("ob_url").value.trim()||null });
+  $("obBtn").disabled=false;
+  if(error){ alert("投稿に失敗しました："+error.message); return; }
+  $("ob_country").value="";$("ob_title").value="";$("ob_body").value="";$("ob_url").value=""; obCountryFilter="すべて"; obThemeFilter="すべて"; await loadBoard();
 }
 
 function renderMedia(){
