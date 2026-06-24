@@ -280,6 +280,8 @@
   /* ── コラム ── */
   .colcomposer{position:static!important; top:auto!important; max-width:760px; margin:0 auto 26px;}
   .colfeed{display:flex; flex-direction:column; gap:26px; max-width:760px; margin:0 auto;}
+  .col-sec-head{max-width:760px; margin:42px auto 18px; padding-top:30px; border-top:1px solid var(--line2);}
+  .col-sec-head h3{font-family:"Shippori Mincho",serif; font-weight:500; font-size:21px;}
   .colart{background:var(--paper); border:1px solid var(--line2); border-radius:8px; overflow:hidden;}
   .colart .col-img{width:100%; height:230px; background-size:cover; background-position:center;}
   .colart .col-in{padding:24px 26px 22px;}
@@ -296,7 +298,7 @@
   .ownctl button:hover{color:var(--bronze);}
   .simcard{display:block; margin-top:20px; border:1px solid var(--line2); border-radius:12px; overflow:hidden; text-decoration:none; background:var(--paper); transition:box-shadow .15s, transform .15s;}
   .simcard:hover{box-shadow:0 8px 22px rgba(36,31,25,.13); transform:translateY(-2px);}
-  .simcard .sc-img{display:block; width:100%; aspect-ratio:820/300; background-size:cover; background-position:center;}
+  .simcard .sc-img{display:block; width:100%; aspect-ratio:820/220; background-size:cover; background-position:center;}
   .simcard .sc-ft{display:flex; align-items:center; justify-content:space-between; gap:12px; padding:14px 18px;}
   .simcard .sc-ft b{font-size:14.5px; color:var(--ink); font-weight:700; letter-spacing:.01em;}
   .simcard .sc-go{font-size:13px; color:#fff; background:#586049; padding:8px 17px; border-radius:30px; white-space:nowrap; font-weight:600;}
@@ -451,12 +453,13 @@
       <div class="fld"><label>リンク（任意）</label><input id="col_url" placeholder="https://"></div>
       <button class="btn" id="colBtn" onclick="addColumn()">公開する</button>
     </div>
-    <div class="colfeed" id="colfeed"></div>
     <div class="innzone">
       <div class="innhead"><h3 class="serif">メンバーの宿</h3><p>ホテルや民泊を運営している方は、ぜひあなたの宿を紹介してください。</p></div>
       <div class="addbar" style="margin:6px 0 22px"><button class="addbtn" onclick="openInnCreate()">＋ 宿を紹介する</button></div>
       <div class="inngrid" id="innfeed"></div>
     </div>
+    <div class="col-sec-head"><h3 class="serif">民泊のコラム・お役立ち</h3></div>
+    <div class="colfeed" id="colfeed"></div>
   </div></section>
 
   <section class="page" id="idealinn"><div class="wrap">
