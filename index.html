@@ -641,7 +641,7 @@ function postCardHtml(p){
     <div class="ph"><div class="who"><span class="avs" ${avStyle(ap)}>${ap?"":esc(ini(an))}</span><span class="nm">${esc(an)}</span><span class="pcat b-${p.category}">${p.category}</span></div><span class="when">${fmt(p.created_at)}</span></div>
     <h4>${esc(p.title)}</h4>
     <div class="body">${linkify(p.body||"")}${(p.url&&!(p.body||"").includes(p.url))?`<br><a href="${esc(p.url)}" target="_blank">${esc(p.url)}</a>`:""}</div>
-    <div class="act"><button class="${liked?'liked':''}" onclick="toggleLike('${p.id}')">${liked?'♥':'♡'} ${likes.length}</button><button>💬 ${cm.length}</button></div>
+    <div class="act"><button class="${liked?'liked':''}" onclick="toggleLike('${p.id}')">${liked?'♥':'♡'} ${likes.length}</button><button>💬 ${cm.length}</button>${(ME&&p.author_id===ME.id)?`<span class="ownctl"><button onclick="editPost('${p.id}')">編集</button><button onclick="delPost('${p.id}')">削除</button></span>`:""}</div>
     <div class="cmts">${cm.map(c=>`<div class="cmt"><div class="ch"><span class="nm">${esc((c.author&&c.author.name)||'メンバー')}</span><span class="wh">${fmt(c.created_at)}</span></div><div class="tx">${esc(c.body)}</div></div>`).join("")}</div>
     <div class="creply"><input id="ci_${p.id}" placeholder="コメントを書く"><button onclick="addComment('${p.id}')">送信</button></div>
   </div>`;
@@ -722,7 +722,7 @@ function renderBoard(){
       <div class="ph"><div class="who"><span class="avs" ${avStyle(ap)}>${ap?"":esc(ini(an))}</span><span class="nm">${esc(an)}</span><span class="pcat b-${p.category}">${p.category}</span></div><span class="when">${fmt(p.created_at)}</span></div>
       <h4>${esc(p.title)}</h4>
       <div class="body">${linkify(p.body||"")}${(p.url&&!(p.body||"").includes(p.url))?`<br><a href="${esc(p.url)}" target="_blank">${esc(p.url)}</a>`:""}</div>
-      <div class="act"><button class="${liked?'liked':''}" onclick="toggleLike('${p.id}')">${liked?'♥':'♡'} ${likes.length}</button><button>💬 ${cm.length}</button></div>
+      <div class="act"><button class="${liked?'liked':''}" onclick="toggleLike('${p.id}')">${liked?'♥':'♡'} ${likes.length}</button><button>💬 ${cm.length}</button>${(ME&&p.author_id===ME.id)?`<span class="ownctl"><button onclick="editPost('${p.id}')">編集</button><button onclick="delPost('${p.id}')">削除</button></span>`:""}</div>
       <div class="cmts">${cm.map(c=>`<div class="cmt"><div class="ch"><span class="nm">${esc((c.author&&c.author.name)||'メンバー')}</span><span class="wh">${fmt(c.created_at)}</span></div><div class="tx">${esc(c.body)}</div></div>`).join("")}</div>
       <div class="creply"><input id="ci_${p.id}" placeholder="コメントを書く"><button onclick="addComment('${p.id}')">送信</button></div>
     </div>`;
@@ -832,7 +832,7 @@ function obCardHtml(p){
     <div class="ph"><div class="who"><span class="avs" ${avStyle(ap)}>${ap?"":esc(ini(an))}</span><span class="nm">${esc(an)}</span>${tags}</div><span class="when">${fmt(p.created_at)}</span></div>
     <h4>${esc(p.title)}</h4>
     <div class="body">${linkify(p.body||"")}${(p.url&&!(p.body||"").includes(p.url))?`<br><a href="${esc(p.url)}" target="_blank">${esc(p.url)}</a>`:""}</div>
-    <div class="act"><button class="${liked?'liked':''}" onclick="toggleLike('${p.id}')">${liked?'♥':'♡'} ${likes.length}</button><button>💬 ${cm.length}</button></div>
+    <div class="act"><button class="${liked?'liked':''}" onclick="toggleLike('${p.id}')">${liked?'♥':'♡'} ${likes.length}</button><button>💬 ${cm.length}</button>${(ME&&p.author_id===ME.id)?`<span class="ownctl"><button onclick="editPost('${p.id}')">編集</button><button onclick="delPost('${p.id}')">削除</button></span>`:""}</div>
     <div class="cmts">${cm.map(c=>`<div class="cmt"><div class="ch"><span class="nm">${esc((c.author&&c.author.name)||'メンバー')}</span><span class="wh">${fmt(c.created_at)}</span></div><div class="tx">${esc(c.body)}</div></div>`).join("")}</div>
     <div class="creply"><input id="ci_${p.id}" placeholder="コメントを書く"><button onclick="addComment('${p.id}')">送信</button></div>
   </div>`;
