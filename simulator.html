@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>民泊・旅館業 物件購入シミュレーター｜Club Borderless</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;500;600&family=Noto+Sans+JP:wght@400;500;700&display=swap');
+
+  :root{
+    --bg:#F5F3ED;
+    --paper:#FBFAF6;
+    --ink:#2C302B;
+    --sub:#6B6F66;
+    --green:#7C8B6F;
+    --green-deep:#586049;
+    --beige:#E4DDCE;
+    --line:#DAD4C5;
+    --accent:#A8744F;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"Noto Sans JP",sans-serif;
+    line-height:1.7;
+    padding:24px 16px 64px;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:560px;margin:0 auto}
+
+  /* header */
+  .head{text-align:center;padding:12px 0 28px}
+  .brand{
+    font-family:"Noto Serif JP",serif;
+    font-size:13px;letter-spacing:.42em;
+    color:var(--green-deep);font-weight:500;
+    padding-left:.42em;
+  }
+  .brand-rule{
+    width:34px;height:1px;background:var(--green);
+    margin:14px auto 22px;
+  }
+  h1{
+    font-family:"Noto Serif JP",serif;
+    font-weight:600;font-size:23px;line-height:1.5;
+    letter-spacing:.02em;
+  }
+  .lead{
+    font-size:13px;color:var(--sub);margin-top:12px;
+    letter-spacing:.02em;
+  }
+
+  /* card */
+  .card{
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:4px;
+    padding:26px 22px;
+    margin-top:22px;
+  }
+  .card-label{
+    font-family:"Noto Serif JP",serif;
+    font-size:12px;letter-spacing:.24em;color:var(--green-deep);
+    padding-left:.24em;
+    display:flex;align-items:center;gap:10px;margin-bottom:20px;
+  }
+  .card-label::after{content:"";flex:1;height:1px;background:var(--line)}
+
+  /* field */
+  .field{margin-bottom:22px}
+  .field:last-child{margin-bottom:0}
+  .field label{
+    display:flex;justify-content:space-between;align-items:baseline;
+    font-size:13px;font-weight:500;margin-bottom:9px;
+  }
+  .field label .hint{font-size:11px;color:var(--sub);font-weight:400}
+  .input-row{position:relative;display:flex;align-items:center}
+  .input-row .unit{
+    position:absolute;right:14px;font-size:13px;color:var(--sub);
+    pointer-events:none;
+  }
+  input[type="number"]{
+    width:100%;font-family:"Noto Sans JP",sans-serif;
+    font-size:17px;font-weight:500;color:var(--ink);
+    background:#fff;border:1px solid var(--line);border-radius:3px;
+    padding:13px 44px 13px 14px;
+    -moz-appearance:textfield;
+  }
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+  input[type="number"]:focus{
+    outline:none;border-color:var(--green);
+    box-shadow:0 0 0 3px rgba(124,139,111,.16);
+  }
+
+  /* range */
+  .range-val{
+    font-family:"Noto Serif JP",serif;font-size:17px;font-weight:600;
+    color:var(--green-deep);
+  }
+  input[type="range"]{
+    -webkit-appearance:none;appearance:none;width:100%;height:3px;
+    background:var(--beige);border-radius:3px;margin-top:14px;
+  }
+  input[type="range"]::-webkit-slider-thumb{
+    -webkit-appearance:none;appearance:none;width:22px;height:22px;
+    border-radius:50%;background:var(--green);cursor:pointer;
+    border:3px solid var(--paper);box-shadow:0 1px 4px rgba(0,0,0,.18);
+  }
+  input[type="range"]::-moz-range-thumb{
+    width:18px;height:18px;border-radius:50%;background:var(--green);
+    cursor:pointer;border:3px solid var(--paper);box-shadow:0 1px 4px rgba(0,0,0,.18);
+  }
+  .scale{display:flex;justify-content:space-between;font-size:10px;color:var(--sub);margin-top:7px}
+  .tip{font-size:11px;color:var(--sub);line-height:1.6;margin-top:9px;padding:8px 11px;background:rgba(228,221,206,.35);border-radius:3px}
+  .tip b{color:var(--green-deep);font-weight:600}
+
+  /* segmented (loan type) */
+  .seg{display:flex;gap:8px;margin-top:2px}
+  .seg button{
+    flex:1;font-family:"Noto Sans JP",sans-serif;font-size:12px;font-weight:500;
+    color:var(--sub);background:#fff;border:1px solid var(--line);
+    border-radius:3px;padding:11px 4px;cursor:pointer;transition:.15s;
+    line-height:1.4;
+  }
+  .seg button .g-rate{display:block;font-size:10px;font-weight:400;margin-top:2px;opacity:.8}
+  .seg button[aria-pressed="true"]{
+    background:var(--green-deep);color:#fff;border-color:var(--green-deep);
+  }
+  .seg button[aria-pressed="true"] .g-rate{opacity:.85}
+
+  /* result */
+  .result{margin-top:22px}
+  .result-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .res-box{
+    background:var(--paper);border:1px solid var(--line);border-radius:4px;
+    padding:20px 18px;
+  }
+  .res-box.full{grid-column:1 / -1;background:var(--green-deep);border-color:var(--green-deep)}
+  .res-box .rk{font-size:11px;color:var(--sub);letter-spacing:.08em;margin-bottom:7px}
+  .res-box.full .rk{color:rgba(255,255,255,.78)}
+  .res-num{font-family:"Noto Serif JP",serif;font-weight:600;color:var(--green-deep);letter-spacing:.01em}
+  .res-box .res-num{font-size:26px}
+  .res-box.full .res-num{color:#fff;font-size:34px}
+  .res-num .yen{font-size:14px;font-weight:500;margin-right:2px}
+  .res-num.full-yen .yen{font-size:18px}
+  .res-num .man{font-size:14px;font-weight:500;margin-left:3px}
+  .res-num .pct{font-size:15px;font-weight:500;margin-left:2px}
+
+  /* section title */
+  .sec-title{
+    font-family:"Noto Serif JP",serif;
+    font-size:12px;letter-spacing:.24em;color:var(--green-deep);
+    padding-left:.24em;display:flex;align-items:center;gap:10px;
+    margin:32px 2px 2px;
+  }
+  .sec-title::after{content:"";flex:1;height:1px;background:var(--line)}
+
+  /* cash flow negative state */
+  .res-box.full.cf-neg{background:var(--accent);border-color:var(--accent)}
+  .res-box.full.cf-neg .rk{color:rgba(255,255,255,.8)}
+  .res-box.full.cf-neg .res-num{color:#fff}
+  .res-box.full.cf-neg .res-sub{color:rgba(255,255,255,.8)}
+  .res-sub{font-size:11px;color:var(--sub);margin-top:6px;line-height:1.6}
+  .res-box.full .res-sub{color:rgba(255,255,255,.72)}
+
+  .breakdown{
+    margin-top:12px;background:var(--paper);border:1px solid var(--line);
+    border-radius:4px;padding:18px 20px;
+  }
+  .bd-row{display:flex;justify-content:space-between;font-size:12.5px;padding:7px 0;color:var(--sub)}
+  .bd-row span:last-child{font-weight:500;color:var(--ink);font-variant-numeric:tabular-nums}
+  .bd-row.total{border-top:1px solid var(--line);margin-top:4px;padding-top:11px;color:var(--ink);font-weight:600}
+  .bd-row.total span:last-child{color:var(--green-deep);font-family:"Noto Serif JP",serif;font-size:14px}
+
+  .note{
+    font-size:11px;color:var(--sub);line-height:1.75;margin-top:20px;
+    padding:16px 18px;background:rgba(228,221,206,.4);border-radius:4px;
+    border:1px solid var(--line);
+  }
+  .note b{color:var(--green-deep);font-weight:600}
+
+  /* footer */
+  .foot{text-align:center;margin-top:34px;padding-top:24px;border-top:1px solid var(--line)}
+  .foot .fb{font-family:"Noto Serif JP",serif;font-size:12px;letter-spacing:.34em;color:var(--green-deep);padding-left:.34em}
+  .foot .fc{font-size:11px;color:var(--sub);margin-top:9px;line-height:1.8}
+  .foot a{color:var(--green-deep);text-decoration:none;border-bottom:1px solid var(--beige)}
+
+  @media(max-width:420px){
+    h1{font-size:20px}
+    .res-box.full .res-num{font-size:29px}
+    .seg{flex-direction:column}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="head">
+    <div class="brand">Club Borderless</div>
+    <div class="brand-rule"></div>
+    <h1>民泊・旅館業<br>物件購入シミュレーター</h1>
+    <p class="lead">物件価格と条件を入れるだけで、<br>必要な自己資金と月々の返済額の目安がわかります。</p>
+  </div>
+
+  <!-- 入力 -->
+  <div class="card">
+    <div class="card-label">CONDITION ／ ご条件</div>
+
+    <div class="field">
+      <label>物件価格 <span class="hint">購入したい物件の価格</span></label>
+      <div class="input-row">
+        <input type="number" id="price" value="3000" min="0" step="100">
+        <span class="unit">万円</span>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>頭金の割合 <span class="range-val" id="dpLabel">15%</span></label>
+      <input type="range" id="downpay" min="0" max="40" value="15" step="5">
+      <div class="scale"><span>0%（フルローン）</span><span>20%</span><span>40%</span></div>
+    </div>
+
+    <div class="field">
+      <label>ローンの種類 <span class="hint">金利は目安。実際は審査で決定</span></label>
+      <div class="seg" id="loanSeg">
+        <button data-rate="2.0" aria-pressed="true">不動産投資ローン<span class="g-rate">年2.0%目安</span></button>
+        <button data-rate="3.5" aria-pressed="false">民泊専用ローン<span class="g-rate">年3.5%目安</span></button>
+        <button data-rate="4.5" aria-pressed="false">ノンバンク等<span class="g-rate">年4.5%目安</span></button>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>金利（年） <span class="range-val" id="rateLabel">2.0%</span></label>
+      <input type="range" id="rate" min="1" max="6" value="2.0" step="0.1">
+      <div class="scale"><span>1%</span><span>3.5%</span><span>6%</span></div>
+    </div>
+
+    <div class="field">
+      <label>返済期間 <span class="range-val" id="yearLabel">25年</span></label>
+      <input type="range" id="years" min="10" max="35" value="25" step="1">
+      <div class="scale"><span>10年</span><span>25年</span><span>35年</span></div>
+    </div>
+  </div>
+
+  <!-- 収益条件 -->
+  <div class="card">
+    <div class="card-label">RETURNS ／ 収益の前提</div>
+
+    <div class="field">
+      <label>1泊あたりの宿泊単価 <span class="hint">ADR・1室1泊の平均</span></label>
+      <div class="input-row">
+        <input type="number" id="adr" value="15000" min="0" step="1000">
+        <span class="unit">円</span>
+      </div>
+      <div class="tip"><b>目安</b>　エリアと部屋数しだい。1室なら1〜2万円、戸建て1棟まるごとなら2〜4万円が一つの目安です。</div>
+    </div>
+
+    <div class="field">
+      <label>稼働率 <span class="range-val" id="occLabel">50%</span></label>
+      <input type="range" id="occ" min="20" max="90" value="50" step="5">
+      <div class="scale"><span>20%</span><span>55%</span><span>90%</span></div>
+      <div class="tip"><b>目安</b>　通年で40〜60%ほど。民泊（住宅宿泊事業）は年180日まで＝実質49%が上限です。旅館業の許可があれば上限はありません。</div>
+    </div>
+
+    <div class="field">
+      <label>運営代行費 <span class="range-val" id="mgmtLabel">20%</span></label>
+      <input type="range" id="mgmt" min="0" max="30" value="20" step="1">
+      <div class="scale"><span>0%</span><span>15%</span><span>30%</span></div>
+      <div class="tip"><b>目安</b>　運営を外部に委託する場合で売上の15〜20%。自分で運営するなら0%にしてください。</div>
+    </div>
+
+    <div class="field">
+      <label>その他運営費（OTA・清掃等） <span class="range-val" id="otherLabel">30%</span></label>
+      <input type="range" id="other" min="0" max="45" value="30" step="1">
+      <div class="scale"><span>0%</span><span>22%</span><span>45%</span></div>
+      <div class="tip"><b>目安</b>　売上の20〜35%。OTA手数料（10〜15%）に、清掃・消耗品・Wi-Fiなどを足した合計です。</div>
+    </div>
+
+    <div class="field">
+      <label>固定費（月） <span class="hint">水光熱・保険・税ならし</span></label>
+      <div class="input-row">
+        <input type="number" id="fixed" value="30000" min="0" step="5000">
+        <span class="unit">円</span>
+      </div>
+      <div class="tip"><b>目安</b>　月2〜5万円。水道光熱費・通信・保険・固定資産税を月割りでならした額です。</div>
+    </div>
+  </div>
+
+  <!-- 結果：資金計画 -->
+  <div class="sec-title">FUNDING ／ 資金計画</div>
+  <div class="result">
+    <div class="result-grid">
+      <div class="res-box full">
+        <div class="rk">月々の返済額（目安）</div>
+        <div class="res-num full-yen" id="monthly"><span class="yen">¥</span>—</div>
+        <div class="res-sub" id="monthlySub">年間返済額 —</div>
+      </div>
+      <div class="res-box">
+        <div class="rk">必要な自己資金</div>
+        <div class="res-num" id="cash"><span class="yen">¥</span>—</div>
+        <div class="res-sub">頭金＋諸費用</div>
+      </div>
+      <div class="res-box">
+        <div class="rk">借入額</div>
+        <div class="res-num" id="loan"><span class="yen">¥</span>—</div>
+        <div class="res-sub">ローンで賄う額</div>
+      </div>
+    </div>
+
+    <div class="breakdown">
+      <div class="bd-row"><span>頭金</span><span id="bdDown">—</span></div>
+      <div class="bd-row"><span>諸費用（物件価格の約8%）</span><span id="bdFee">—</span></div>
+      <div class="bd-row total"><span>用意したい自己資金 合計</span><span id="bdTotal">—</span></div>
+    </div>
+  </div>
+
+  <!-- 結果：収支 -->
+  <div class="sec-title">PROFIT ／ 収支シミュレーション</div>
+  <div class="result">
+    <div class="result-grid">
+      <div class="res-box full" id="cfBox">
+        <div class="rk">月の手残り（返済後キャッシュフロー）</div>
+        <div class="res-num full-yen" id="cf"><span class="yen">¥</span>—</div>
+        <div class="res-sub" id="cfSub">年間 —</div>
+      </div>
+      <div class="res-box">
+        <div class="rk">月間の想定売上</div>
+        <div class="res-num" id="rev"><span class="yen">¥</span>—</div>
+        <div class="res-sub">単価 × 稼働率 × 30.4日</div>
+      </div>
+      <div class="res-box">
+        <div class="rk">実質利回り（目安）</div>
+        <div class="res-num" id="yieldNet">—<span class="pct">%</span></div>
+        <div class="res-sub" id="yieldGross">表面利回り —</div>
+      </div>
+    </div>
+
+    <div class="breakdown">
+      <div class="bd-row"><span>月間売上</span><span id="bdRev">—</span></div>
+      <div class="bd-row"><span>運営代行費</span><span id="bdMgmt">—</span></div>
+      <div class="bd-row"><span>その他運営費（OTA・清掃等）</span><span id="bdOther">—</span></div>
+      <div class="bd-row"><span>固定費</span><span id="bdFixed">—</span></div>
+      <div class="bd-row"><span>ローン返済</span><span id="bdLoanPay">—</span></div>
+      <div class="bd-row total"><span>月の手残り</span><span id="bdCf">—</span></div>
+    </div>
+  </div>
+
+  <div class="note">
+    <b>ご注意</b>　本シミュレーションは概算の目安です。実際の金利・融資額・諸費用はご年収やご資産状況、物件評価、金融機関によって変わります。民泊・旅館業の物件は担保評価が控えめになる傾向があり、表示額より融資枠が1〜2割少なくなる場合があります。諸費用は物件価格の約8%（登記費用・仲介手数料・不動産取得税等）で計算しています。また、民泊・旅館業として開業する場合は、家具・家電・寝具・リネン、消防設備、用途変更や各種申請などの初期費用が別途かかります。想定売上・利回りは入力した宿泊単価と稼働率に基づく目安で、実際は季節・立地・運営で変動します。住宅宿泊事業（いわゆる民泊）は年間提供日数が180日までに制限されるため、稼働率は実質49%程度が上限です（旅館業許可の場合は上限なし）。
+  </div>
+
+  <div class="foot">
+    <div class="fb">Club Borderless</div>
+  </div>
+
+</div>
+
+<script>
+  const $ = id => document.getElementById(id);
+  const fmtMan = man => Math.round(man).toLocaleString('ja-JP') + '万円';
+
+  function calc(){
+    const price = Math.max(0, +$('price').value || 0);
+    const dpPct = +$('downpay').value;
+    const rate  = +$('rate').value;
+    const years = +$('years').value;
+
+    const down   = price * dpPct/100;          // 頭金（万円）
+    const fee    = price * 0.08;               // 諸費用（万円）
+    const cash   = down + fee;                 // 必要自己資金
+    const loan   = price - down;               // 借入額
+
+    // 元利均等返済の月額
+    const P = loan * 10000;                    // 円
+    const n = years * 12;
+    const r = rate/100/12;
+    let monthly;
+    if(P <= 0){ monthly = 0; }
+    else if(r === 0){ monthly = P / n; }
+    else { monthly = P * r * Math.pow(1+r,n) / (Math.pow(1+r,n)-1); }
+
+    const annual = monthly * 12;
+
+    // 表示
+    $('monthly').innerHTML = '<span class="yen">¥</span>' + Math.round(monthly).toLocaleString('ja-JP');
+    $('monthlySub').textContent = '年間返済額 約 ¥' + Math.round(annual).toLocaleString('ja-JP');
+    $('cash').innerHTML = Math.round(cash).toLocaleString('ja-JP') + '<span class="man">万円</span>';
+    $('loan').innerHTML = Math.round(loan).toLocaleString('ja-JP') + '<span class="man">万円</span>';
+    $('bdDown').textContent  = fmtMan(down) + '（' + dpPct + '%）';
+    $('bdFee').textContent   = fmtMan(fee);
+    $('bdTotal').textContent = fmtMan(cash);
+
+    // ===== 収支 =====
+    const adr    = Math.max(0, +$('adr').value || 0);
+    const occ    = +$('occ').value;
+    const mgmtP  = +$('mgmt').value;
+    const othP   = +$('other').value;
+    const fixedY = Math.max(0, +$('fixed').value || 0);
+
+    const rev   = adr * 30.4 * occ/100;     // 月間売上（円）
+    const mgmt  = rev * mgmtP/100;          // 運営代行費
+    const other = rev * othP/100;           // その他運営費
+    const noi   = rev - mgmt - other - fixedY; // 営業利益（返済前）
+    const cf    = noi - monthly;            // 月の手残り
+
+    const grossY = price > 0 ? (rev*12)/(price*10000)*100 : 0;        // 表面利回り
+    const netY   = (price+fee) > 0 ? (noi*12)/((price+fee)*10000)*100 : 0; // 実質利回り
+
+    const yen = v => Math.round(v).toLocaleString('ja-JP');
+    $('rev').innerHTML       = '<span class="yen">¥</span>' + yen(rev);
+    $('cf').innerHTML        = '<span class="yen">¥</span>' + yen(cf);
+    $('cfSub').textContent   = '年間 約 ¥' + yen(cf*12);
+    $('yieldNet').innerHTML  = netY.toFixed(1) + '<span class="pct">%</span>';
+    $('yieldGross').textContent = '表面利回り ' + grossY.toFixed(1) + '%';
+    $('bdRev').textContent     = '¥' + yen(rev);
+    $('bdMgmt').textContent    = '− ¥' + yen(mgmt);
+    $('bdOther').textContent   = '− ¥' + yen(other);
+    $('bdFixed').textContent   = '− ¥' + yen(fixedY);
+    $('bdLoanPay').textContent = '− ¥' + yen(monthly);
+    $('bdCf').textContent      = '¥' + yen(cf);
+
+    $('cfBox').classList.toggle('cf-neg', cf < 0);
+  }
+
+  // labels
+  $('downpay').addEventListener('input', e=>{ $('dpLabel').textContent = e.target.value + '%'; calc(); });
+  $('rate').addEventListener('input', e=>{
+    const v = +e.target.value;
+    $('rateLabel').textContent = v.toFixed(1) + '%';
+    // 金利を手で動かしたらローン種類の選択を同期（一致すれば点灯／なければ全解除）
+    [...$('loanSeg').children].forEach(b=>b.setAttribute('aria-pressed', (+b.dataset.rate===v) ? 'true' : 'false'));
+    calc();
+  });
+  $('years').addEventListener('input', e=>{ $('yearLabel').textContent = e.target.value + '年'; calc(); });
+  $('price').addEventListener('input', calc);
+
+  // 収益条件
+  $('adr').addEventListener('input', calc);
+  $('fixed').addEventListener('input', calc);
+  $('occ').addEventListener('input', e=>{ $('occLabel').textContent = e.target.value + '%'; calc(); });
+  $('mgmt').addEventListener('input', e=>{ $('mgmtLabel').textContent = e.target.value + '%'; calc(); });
+  $('other').addEventListener('input', e=>{ $('otherLabel').textContent = e.target.value + '%'; calc(); });
+
+  // loan type segmented -> sets rate
+  $('loanSeg').addEventListener('click', e=>{
+    const btn = e.target.closest('button');
+    if(!btn) return;
+    [...$('loanSeg').children].forEach(b=>b.setAttribute('aria-pressed','false'));
+    btn.setAttribute('aria-pressed','true');
+    const rate = +btn.dataset.rate;
+    $('rate').value = rate;
+    $('rateLabel').textContent = rate.toFixed(1) + '%';
+    calc();
+  });
+
+  calc();
+</script>
+</body>
+</html>
