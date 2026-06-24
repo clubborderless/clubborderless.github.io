@@ -302,6 +302,8 @@
   .simcard .sc-go{font-size:13px; color:#fff; background:#586049; padding:8px 17px; border-radius:30px; white-space:nowrap; font-weight:600;}
   .linkbtn{display:inline-block; margin-top:18px; font-size:13.5px; font-weight:700; color:var(--bronze); text-decoration:none; border:1px solid var(--line); padding:9px 17px; border-radius:30px;}
   .linkbtn:hover{border-color:var(--bronze);}
+  .tab .newdot{display:none;}
+  .tab .newdot.on{display:inline-block; width:7px; height:7px; border-radius:50%; background:#c0392b; vertical-align:top; margin-left:2px;}
   .nb{white-space:nowrap;}
 
   /* ── メンバーの宿（民泊タブ下部） ── */
@@ -376,12 +378,12 @@
 
   <nav class="tabs"><div class="tabs-in">
     <button class="tab on" data-tab="members">メンバー<span class="en">MEMBERS</span></button>
-    <button class="tab" data-tab="board">掲示板<span class="en">BOARD</span></button>
-    <button class="tab" data-tab="useful">お役立ち<span class="en">RESOURCES</span></button>
-    <button class="tab" data-tab="outbound">アウトバウンド<span class="en">OUTBOUND</span></button>
-    <button class="tab" data-tab="column">民泊<span class="en">MINPAKU</span></button>
-    <button class="tab" data-tab="idealinn">理想の宿<span class="en">IDEAL INN</span></button>
-    <button class="tab" data-tab="events">イベント<span class="en">EVENTS</span></button>
+    <button class="tab" data-tab="board">掲示板<span class="newdot"></span><span class="en">BOARD</span></button>
+    <button class="tab" data-tab="useful">お役立ち<span class="newdot"></span><span class="en">RESOURCES</span></button>
+    <button class="tab" data-tab="outbound">アウトバウンド<span class="newdot"></span><span class="en">OUTBOUND</span></button>
+    <button class="tab" data-tab="column">民泊<span class="newdot"></span><span class="en">MINPAKU</span></button>
+    <button class="tab" data-tab="idealinn">理想の宿<span class="newdot"></span><span class="en">IDEAL INN</span></button>
+    <button class="tab" data-tab="events">イベント<span class="newdot"></span><span class="en">EVENTS</span></button>
     <button class="tab" data-tab="shop">DEEP JAPAN<span class="en">SHOP</span></button>
   </div></nav>
 
@@ -554,6 +556,7 @@ async function render(session){
   await ensureMe(session);
   $("loading").classList.add("hidden"); $("app").classList.remove("hidden");
   await Promise.all([loadMembers(), loadBoard(), loadResources(), loadEvents()]);
+  updateTabBadges();
 }
 async function ensureMe(session){
   let { data } = await sb.from("profiles").select("*").eq("user_id",session.user.id).maybeSingle();
@@ -994,10 +997,35 @@ function prefillShop(){ /* 初期値の自動入力はしない（フォーム�
 }
 
 /* ---------- tabs ---------- */
+const BADGE_TABS=["board","useful","outbound","column","idealinn","events"];
+function latestTs(arr){ let m=0; (arr||[]).forEach(x=>{ const t=(x&&x.created_at)?new Date(x.created_at).getTime():0; if(t>m)m=t; }); return m; }
+function tabDataLatest(tab){
+  if(tab==="column") return latestTs(POSTS.filter(p=>p.category==="コラム"));
+  if(tab==="board") return latestTs(POSTS.filter(p=>!["コラム","理想の宿","宿紹介","アウトバウンド"].includes(p.category)));
+  if(tab==="outbound") return latestTs(POSTS.filter(p=>p.category==="アウトバウンド"));
+  if(tab==="idealinn") return latestTs(POSTS.filter(p=>["理想の宿","宿紹介"].includes(p.category)));
+  if(tab==="events") return latestTs(EVENTS);
+  if(tab==="useful") return latestTs(RESOURCES);
+  return 0;
+}
+function updateTabBadges(){
+  BADGE_TABS.forEach(tab=>{
+    const latest=tabDataLatest(tab), seen=+(localStorage.getItem("seen_"+tab)||0);
+    const dot=document.querySelector('.tab[data-tab="'+tab+'"] .newdot');
+    if(dot) dot.classList.toggle("on", latest>0 && latest>seen);
+  });
+}
+function markSeen(tab){
+  if(!BADGE_TABS.includes(tab)) return;
+  localStorage.setItem("seen_"+tab, String(Math.max(tabDataLatest(tab), Date.now())));
+  const dot=document.querySelector('.tab[data-tab="'+tab+'"] .newdot');
+  if(dot) dot.classList.remove("on");
+}
 function switchTab(name){
   document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("on",x.dataset.tab===name));
   document.querySelectorAll(".page").forEach(x=>x.classList.toggle("on",x.id===name));
   window.scrollTo({top:0});
+  markSeen(name); updateTabBadges();
 }
 document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>switchTab(t.dataset.tab));
 
