@@ -172,8 +172,12 @@
   }
   .bd-row{display:flex;justify-content:space-between;font-size:12.5px;padding:7px 0;color:var(--sub)}
   .bd-row span:last-child{font-weight:500;color:var(--ink);font-variant-numeric:tabular-nums}
+  .bd-row.subtotal{border-top:1px solid var(--line);margin-top:4px;padding-top:11px;color:var(--ink);font-weight:600}
+  .bd-row.subtotal span:last-child{color:var(--ink);font-variant-numeric:tabular-nums}
   .bd-row.total{border-top:1px solid var(--line);margin-top:4px;padding-top:11px;color:var(--ink);font-weight:600}
   .bd-row.total span:last-child{color:var(--green-deep);font-family:"Noto Serif JP",serif;font-size:14px}
+  .bd-note{font-size:11px;color:var(--sub);line-height:1.6;margin-top:10px;padding-top:10px;border-top:1px dashed var(--line)}
+  .bd-note b{color:var(--green-deep);font-weight:600}
 
   .note{
     font-size:11px;color:var(--sub);line-height:1.75;margin-top:20px;
@@ -343,8 +347,10 @@
       <div class="bd-row"><span>運営代行費</span><span id="bdMgmt">—</span></div>
       <div class="bd-row"><span>その他運営費（OTA・清掃等）</span><span id="bdOther">—</span></div>
       <div class="bd-row"><span>固定費</span><span id="bdFixed">—</span></div>
-      <div class="bd-row"><span>ローン返済</span><span id="bdLoanPay">—</span></div>
+      <div class="bd-row subtotal"><span>営業利益（ローン返済前）</span><span id="bdNoi">—</span></div>
+      <div class="bd-row"><span>ローン返済を引く</span><span id="bdLoanPay">—</span></div>
       <div class="bd-row total"><span>月の手残り</span><span id="bdCf">—</span></div>
+      <div class="bd-note"><b>ポイント</b>　ローン返済は運営コストとは別もの。とくに元金部分は借入が減って資産として積み上がるお金なので、オーナーの実質的な取り分は「手残り＋元金返済分」で見るのが実態に近いです。</div>
     </div>
   </div>
 
@@ -419,6 +425,7 @@
     $('bdMgmt').textContent    = '− ¥' + yen(mgmt);
     $('bdOther').textContent   = '− ¥' + yen(other);
     $('bdFixed').textContent   = '− ¥' + yen(fixedY);
+    $('bdNoi').textContent     = '¥' + yen(noi);
     $('bdLoanPay').textContent = '− ¥' + yen(monthly);
     $('bdCf').textContent      = '¥' + yen(cf);
 
