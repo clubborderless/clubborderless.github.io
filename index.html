@@ -288,6 +288,20 @@
   .colart .col-meta .nm{color:var(--sub);}
   .colart h3{font-family:"Shippori Mincho",serif; font-weight:500; font-size:21px; margin-bottom:11px; line-height:1.55;}
   .colart .col-body{font-size:15px; color:var(--sub); line-height:1.95; white-space:pre-wrap;}
+  .colart .act{display:flex; align-items:center; gap:18px; margin-top:34px; padding-top:18px; border-top:1px solid var(--line2);}
+  .colart .act button{background:none; border:none; font-size:13.5px; color:var(--muted); letter-spacing:.04em; cursor:pointer;}
+  .colart .act button.liked{color:var(--bronze);} .colart .act button:hover{color:var(--bronze);}
+  .ownctl{display:flex; gap:14px; margin-left:auto;}
+  .ownctl button{background:none; border:none; font-size:12px; color:var(--muted); cursor:pointer; letter-spacing:.04em;}
+  .ownctl button:hover{color:var(--bronze);}
+  .simcard{display:block; margin-top:20px; border:1px solid var(--line2); border-radius:12px; overflow:hidden; text-decoration:none; background:var(--paper); transition:box-shadow .15s, transform .15s;}
+  .simcard:hover{box-shadow:0 8px 22px rgba(36,31,25,.13); transform:translateY(-2px);}
+  .simcard .sc-img{display:block; width:100%; aspect-ratio:820/300; background-size:cover; background-position:center;}
+  .simcard .sc-ft{display:flex; align-items:center; justify-content:space-between; gap:12px; padding:14px 18px;}
+  .simcard .sc-ft b{font-size:14.5px; color:var(--ink); font-weight:700; letter-spacing:.01em;}
+  .simcard .sc-go{font-size:13px; color:#fff; background:#586049; padding:8px 17px; border-radius:30px; white-space:nowrap; font-weight:600;}
+  .linkbtn{display:inline-block; margin-top:18px; font-size:13.5px; font-weight:700; color:var(--bronze); text-decoration:none; border:1px solid var(--line); padding:9px 17px; border-radius:30px;}
+  .linkbtn:hover{border-color:var(--bronze);}
   .nb{white-space:nowrap;}
 
   /* ── メンバーの宿（民泊タブ下部） ── */
@@ -722,13 +736,19 @@ function renderColumns(){
     const an=(p.author&&p.author.name)||"GRACES", ap=p.author&&p.author.photo_url;
     const cm=COMMENTS.filter(c=>c.post_id===p.id);
     const likes=LIKES.filter(l=>l.post_id===p.id); const liked=likes.some(l=>l.user_id===currentUid());
+    const isOwner=ME&&p.author_id===ME.id;
+    let bodyShown=p.body||""; if(p.url){ bodyShown=bodyShown.split("\n").filter(l=>l.trim()!==p.url.trim()).join("\n").replace(/\n{3,}/g,"\n\n").trim(); }
+    const linkHtml=p.url?((p.url.includes("simulator"))
+      ?`<a class="simcard" href="${esc(p.url)}" target="_blank"><span class="sc-img" style="background-image:url('sim-card.svg')"></span><span class="sc-ft"><b>物件購入シミュレーターを試す</b><span class="sc-go">開く →</span></span></a>`
+      :`<a class="linkbtn" href="${esc(p.url)}" target="_blank">${esc(p.url)} →</a>`):"";
     return `<article class="colart">
       ${p.image_url?`<div class="col-img" style="background-image:url('${esc(p.image_url)}')"></div>`:""}
       <div class="col-in">
         <div class="col-meta"><span class="avs" ${avStyle(ap)}>${ap?"":esc(ini(an))}</span><span class="nm">${esc(an)}</span><span class="when">${fmt(p.created_at)}</span></div>
         <h3 class="serif">${esc(p.title)}</h3>
-        <div class="col-body">${linkify(p.body||"")}${(p.url&&!(p.body||"").includes(p.url))?`<br><a href="${esc(p.url)}" target="_blank">${esc(p.url)}</a>`:""}</div>
-        <div class="act"><button class="${liked?'liked':''}" onclick="toggleLike('${p.id}')">${liked?'♥':'♡'} ${likes.length}</button><button>💬 ${cm.length}</button></div>
+        <div class="col-body">${linkify(bodyShown)}</div>
+        ${linkHtml}
+        <div class="act"><button class="${liked?'liked':''}" onclick="toggleLike('${p.id}')">${liked?'♥':'♡'} ${likes.length}</button><button>💬 ${cm.length}</button>${isOwner?`<span class="ownctl"><button onclick="editPost('${p.id}')">編集</button><button onclick="delPost('${p.id}')">削除</button></span>`:""}</div>
         <div class="cmts">${cm.map(c=>`<div class="cmt"><div class="ch"><span class="nm">${esc((c.author&&c.author.name)||'メンバー')}</span><span class="wh">${fmt(c.created_at)}</span></div><div class="tx">${esc(c.body)}</div></div>`).join("")}</div>
         <div class="creply"><input id="ci_${p.id}" placeholder="コメントを書く"><button onclick="addComment('${p.id}')">送信</button></div>
       </div>
@@ -772,6 +792,30 @@ async function toggleLike(pid){
   const liked=LIKES.some(l=>l.post_id===pid&&l.user_id===currentUid());
   if(liked) await sb.from("post_likes").delete().eq("post_id",pid).eq("user_id",currentUid());
   else await sb.from("post_likes").insert({ post_id:pid, user_id:currentUid() });
+  await loadBoard();
+}
+
+async function editPost(id){
+  const p=POSTS.find(x=>x.id===id); if(!p) return;
+  $("modalbox").innerHTML=`<button class="x" onclick="closeModal()">×</button><h3>投稿を編集</h3><div style="height:14px"></div>
+    <div class="fld"><label>タイトル</label><input id="ed_title" value="${esc(p.title||"")}"></div>
+    <div class="fld"><label>本文</label><textarea id="ed_body" rows="10">${esc(p.body||"")}</textarea></div>
+    <div class="fld"><label>リンク（任意）</label><input id="ed_url" value="${esc(p.url||"")}" placeholder="https://"></div>
+    <button class="btn" id="edBtn" onclick="saveEdit('${id}')">保存する</button>`;
+  $("modal").classList.add("on");
+}
+async function saveEdit(id){
+  const t=$("ed_title").value.trim(), b=$("ed_body").value.trim(), u=$("ed_url").value.trim()||null;
+  $("edBtn").disabled=true;
+  const { error }=await sb.from("posts").update({ title:t||"(無題)", body:b, url:u }).eq("id",id);
+  $("edBtn").disabled=false;
+  if(error){ alert("更新に失敗しました："+error.message); return; }
+  closeModal(); await loadBoard();
+}
+async function delPost(id){
+  if(!confirm("この投稿を削除しますか？元に戻せません。")) return;
+  const { error }=await sb.from("posts").delete().eq("id",id);
+  if(error){ alert("削除に失敗しました："+error.message); return; }
   await loadBoard();
 }
 
