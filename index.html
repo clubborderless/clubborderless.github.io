@@ -951,10 +951,13 @@ function openProfileEdit(){
 }
 async function saveProfile(){
   $("pfBtn").disabled=true;
+  const gu=await sb.auth.getUser();
+  const user=gu&&gu.data&&gu.data.user;
+  if(!user){ $("pfBtn").disabled=false; alert("ログインの有効期限が切れています。お手数ですが一度ログアウト→ログインし直してから、もう一度保存してください。"); return; }
   let photo_url=ME.photo_url||null;
   const file=$("pf_photo").files[0];
   if(file){
-    const path=currentUid()+"/"+Date.now()+"_"+file.name.replace(/[^\w.\-]/g,"");
+    const path=user.id+"/"+Date.now()+"_"+file.name.replace(/[^\w.\-]/g,"");
     const up=await sb.storage.from("avatars").upload(path,file,{upsert:true});
     if(!up.error){ photo_url=sb.storage.from("avatars").getPublicUrl(path).data.publicUrl; }
   }
@@ -962,10 +965,11 @@ async function saveProfile(){
     location:$("pf_loc").value.trim()||null, bio:$("pf_bio").value.trim()||null, give:$("pf_give").value.trim()||null,
     target:$("pf_target").value.trim()||null, want:$("pf_want").value.trim()||null, abroad:$("pf_abroad").value.trim()||null,
     web:$("pf_web").value.trim()||null, sns:$("pf_sns").value.trim()||null, photo_url };
-  const { data, error }=await sb.from("profiles").update(patch).eq("id",ME.id).select().single();
+  const { data, error }=await sb.from("profiles").update(patch).eq("user_id",user.id).select();
   $("pfBtn").disabled=false;
   if(error){ alert("保存に失敗しました："+error.message); return; }
-  ME=data; $("meName").textContent=ME.name; if(ME.photo_url)$("meAv").style.backgroundImage=`url('${ME.photo_url}')`; else $("meAv").textContent=ini(ME.name);
+  if(!data||!data.length){ alert("あなたのプロフィールが見つかりませんでした。お手数ですが一度ログアウト→ログインし直してから、もう一度お試しください。直らない場合は事務局までご連絡ください。"); return; }
+  ME=data[0]; $("meName").textContent=ME.name; if(ME.photo_url)$("meAv").style.backgroundImage=`url('${ME.photo_url}')`; else $("meAv").textContent=ini(ME.name);
   closeModal(); await loadMembers();
 }
 
