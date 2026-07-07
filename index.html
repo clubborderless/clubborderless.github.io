@@ -259,6 +259,7 @@
   .shopform{background:var(--paper); border:1px solid var(--line2); border-radius:8px; padding:26px 24px;}
   .shopform h3{font-size:19px; margin-bottom:8px;}
   .shopform-note{font-size:13px; color:var(--muted); margin-bottom:18px; line-height:1.8;}
+  .shopform-hint{font-size:11px; color:var(--muted); line-height:1.7; margin-top:5px;}
   .fgroup{font-size:12px; letter-spacing:.14em; color:var(--bronze); font-weight:600; margin:22px 0 12px; padding-bottom:7px; border-bottom:1px solid var(--line2);}
   .fgroup:first-of-type{margin-top:6px;}
   .shopform input[type=file]{font-size:13px; color:var(--sub); padding:9px 12px;}
@@ -502,6 +503,8 @@
         <div class="fld"><label>事業・ブランド名</label><input id="sh_brand"></div>
         <div class="fld"><label>何を売りたい・PRしたいですか？（ざっくりでOK）</label><textarea id="sh_lead" placeholder="例：自然栽培米のギフト／着物リメイクのドレス／書道体験 など"></textarea></div>
         <div class="fld"><label>連絡先（メール・SNSなど、ご連絡が取れるもの）</label><input id="sh_contact"></div>
+        <div class="fld"><label>商品・つくり手の写真（最大5枚・任意／後からでもOK）</label><input id="sh_photos" type="file" accept="image/*" multiple><div class="shopform-hint">縦向き・明るい場所で。全体／中身のアップ／雰囲気カットなどがあると嬉しいです。</div></div>
+        <div class="fld"><label>PR動画・YouTube（横向き30〜60秒・任意／後からでもOK）</label><input id="sh_youtube" placeholder="https://（YouTube・Googleドライブ・WeTransfer など）"><div class="shopform-hint">iPhoneでOK。自己紹介＋商品の見どころを一言、最後に商品を手に持って。</div></div>
         <details class="shopmore">
           <summary>詳しく書ける方はこちら（任意・後からでもOK）</summary>
           <div class="fld"><label>商品・体験の名前</label><input id="sh_pname"></div>
@@ -511,8 +514,6 @@
           <div class="fld"><label>ひとことメッセージ</label><input id="sh_quote"></div>
           <div class="fld"><label>Web・HP</label><input id="sh_url" placeholder="https://"></div>
           <div class="fld"><label>Instagram</label><input id="sh_instagram" placeholder="@... または URL"></div>
-          <div class="fld"><label>YouTube動画（横向き1〜2分の想い・任意／後から追加OK）</label><input id="sh_youtube" placeholder="https://"></div>
-          <div class="fld"><label>商品・つくり手の写真（最大5枚）</label><input id="sh_photos" type="file" accept="image/*" multiple></div>
         </details>
         <div class="fld"><label>ひとこと・質問など（任意）</label><textarea id="sh_note"></textarea></div>
         <button class="btn" id="shBtn" onclick="submitShop()">送信する</button>
